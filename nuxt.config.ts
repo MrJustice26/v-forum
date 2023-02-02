@@ -29,6 +29,8 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
-        mongodbPassword: process.env.MONGODB_PASSWORD
+        mongodbPassword: process.env.MONGODB_PASSWORD,
+        jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+        jwtAccessSecret: process.env.JWT_ACCESS_SECRET
     }
 })
