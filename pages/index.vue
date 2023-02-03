@@ -32,14 +32,14 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted } from "vue";
 
-interface IPost {
+interface Post {
   userId: number;
   id: number;
   title: string;
   body: string;
 }
 
-const posts: Ref<IPost[] | []> = ref([]);
+const posts: Ref<Post[] | []> = ref([]);
 
 const fetchPosts = async (): Promise<void> => {
   try {
@@ -54,7 +54,6 @@ onMounted(() => fetchPosts());
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/variables.scss";
 .intro {
   background: #013220;
   padding: 1.5rem 0;
