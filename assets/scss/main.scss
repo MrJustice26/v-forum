@@ -1,7 +1,4 @@
-@import "./variables.scss";
-
 body {
-  font-family: "Montserrat", arial;
   background: $color-black;
   color: $color-white;
   margin: 0;
@@ -17,4 +14,5 @@ body {
 
 * {
   box-sizing: border-box;
+  font-family: "Montserrat", arial;
 }

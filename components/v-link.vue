@@ -5,14 +5,13 @@
 </template>
 
 <script setup lang="ts">
-interface IProps {
+interface Props {
   to: string;
 }
-defineProps<IProps>();
+defineProps<Props>();
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/scss/variables.scss";
 .main-link {
   font-size: 1.5rem;
   font-weight: 600;

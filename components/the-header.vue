@@ -6,8 +6,8 @@
       </div>
       <div class="col">
         <v-link to="/">Home</v-link>
-        <v-link to="/login">Log in</v-link>
-        <v-link to="/signup">Register</v-link>
+        <v-link to="/auth/login">Log in</v-link>
+        <v-link to="/auth/register">Register</v-link>
       </div>
       <div class="col"></div>
     </nav>
