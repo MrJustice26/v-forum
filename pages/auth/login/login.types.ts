@@ -1,11 +1,6 @@
-interface LoginField {
-    value: string;
-    istouched: boolean;
-  }
-  
   interface LoginFields {
-    email: LoginField;
-    password: LoginField;
+    email: string;
+    password: string;
   }
 
 type LoginFieldsErrors = Partial<Record<keyof LoginFields, string>>

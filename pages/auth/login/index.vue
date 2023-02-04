@@ -2,28 +2,39 @@
   <div class="container">
     <div class="auth">
       <h1>Welcome back!</h1>
+      <v-alert variant="success"> Successfull login! </v-alert>
+      <p v-if="isFetching">Loading...</p>
       <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label for="email-input">Email</label>
-          <v-input
-            id="email-input"
-            type="text"
-            placeholder="example@gmail.com"
-            v-model="loginFieldValues.email.value"
-          />
-        </div>
-        <div class="form-group">
-          <label for="pass-input">Password</label>
-          <v-input
-            id="pass-input"
-            type="text"
-            placeholder="1234567890"
-            v-model="loginFieldValues.password.value"
-          />
+        <div class="form-content">
+          <div class="form-group">
+            <label for="email-input">Email</label>
+            <v-input
+              id="email-input"
+              type="text"
+              placeholder="example@gmail.com"
+              v-model="loginFieldValues.email"
+              :is-error="!!errors.email"
+            />
+            <span class="error-text">{{ errors.email }}</span>
+          </div>
+          <div class="form-group">
+            <label for="pass-input">Password</label>
+            <v-input
+              autocomplete="on"
+              id="pass-input"
+              type="password"
+              placeholder="1234567890"
+              :is-error="!!errors.password"
+              v-model="loginFieldValues.password"
+            />
+            <span class="error-text">{{ errors.password }}</span>
+          </div>
         </div>
 
         <div class="form-actions">
-          <v-button class="btn btn-primary" type="submit">Login</v-button>
+          <v-button class="btn btn-primary" :disabled="isFetching" type="submit"
+            >Login</v-button
+          >
         </div>
       </form>
     </div>
@@ -32,22 +43,43 @@
 
 <script setup lang="ts">
 import { ref, Ref } from "vue";
+import { useAuthStore } from "~/stores/auth";
 import { LoginFields, LoginFieldsErrors } from "./login.types";
 import loginValidate from "./validate";
 
+const authStore = useAuthStore();
+
 const loginFieldValues: Ref<LoginFields> = ref({
-  email: {
-    value: "",
-    istouched: false,
-  },
-  password: {
-    value: "",
-    istouched: false,
-  },
+  email: "",
+  password: "",
 });
 
-const submitForm = () => {
-  const errors: LoginFieldsErrors = loginValidate(loginFieldValues.value);
+const isFetching = ref(false);
+const authFeedback = ref("");
+
+const errors: Ref<LoginFieldsErrors> = ref({});
+
+const submitForm = async () => {
+  authFeedback.value = "";
+  const receivedErrors: LoginFieldsErrors = loginValidate(
+    loginFieldValues.value
+  );
+  errors.value = receivedErrors;
+
+  const keysAmount = Object.keys(errors.value).length;
+  if (keysAmount > 0) return;
+  isFetching.value = true;
+  const { data: jsonData, error } = await useFetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(loginFieldValues.value),
+  });
+  isFetching.value = false;
+  if (error.value) {
+    authFeedback.value = error.value.statusMessage!;
+  } else {
+    authStore.setUser(jsonData.value?.user?.email);
+    navigateTo("/");
+  }
 };
 </script>
 
@@ -67,17 +99,23 @@ const submitForm = () => {
   }
 }
 
+.form-content {
+  margin-bottom: 1.5rem;
+}
 .form-group {
   display: flex;
   flex-direction: column;
   row-gap: 0.5rem;
-  &:not(:last-child) {
-    margin-bottom: 30px;
-  }
+  margin-bottom: 1rem;
 }
 
 .form-actions {
   display: flex;
   flex-direction: column;
+}
+
+.error-text {
+  color: $color-red;
+  font-size: 0.8rem;
 }
 </style>

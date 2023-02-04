@@ -1,5 +1,4 @@
 import User from "~/server/models/User";
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 export default defineEventHandler(async (event) => {
@@ -8,49 +7,28 @@ export default defineEventHandler(async (event) => {
 
     const {email, password} = await readBody(event);
 
-    if(!email || !password){
-        return {
-            status: 400,
-            data: {
-                message: "Fields must not be empty!"
-            }
-        }
-    }
+    const errorAuthCredentialsAreIncorrect = "Email or password are incorrect!"
+
 
     const user = await User.findOne({email})
     if(!user){
-        return {
-            status: 400,
-            data: {
-                message: "Email or password is not correct!"
-            }
-        }
+        event.node.res.statusCode = 401
+        event.node.res.statusMessage = errorAuthCredentialsAreIncorrect;
+        return {}
     }
 
     const result = await bcrypt.compare(password, user.password);
     if(!result){
-        return {
-            status: 400,
-            data: {
-                message: "Email or password is not correct!"
-            }
-        }
+        event.node.res.statusCode = 401
+        event.node.res.statusMessage = errorAuthCredentialsAreIncorrect;
+        return {}
     }
 
-    const userPayload = {
-        email,
-        password: user.password
-    }
     
-    const token = jwt.sign(userPayload, config.jwtAccessSecret, {expiresIn: '1h'})
-
-    setHeader(event, 'Authorization', `Bearer ${token}`)
+    setCookie(event,'refreshToken', user.refreshToken, {maxAge:6 * 60 * 60 * 1000 });
 
     return {
-        status: 200,
-        data: {
-            message: "Successfull login!"
-        }
+        user
     }
 
 })

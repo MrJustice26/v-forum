@@ -1,4 +1,7 @@
 $color-black: #18181b;
-$color-green: #013220;
+$color-green: #026440;
+$bg-green: darken(desaturate($color-green, 40%), 10%);
 $color-lighter-green: lighten($color-green, 50%);
 $color-white: #fff;
+$color-red: #ee4b2b;
+$bg-red: darken(desaturate($color-red, 40%), 40%); ;

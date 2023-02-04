@@ -1,16 +1,20 @@
 <template>
-  <input @input="handleInput($event)" class="input" />
+  <input
+    @input="handleInput($event)"
+    :class="['input', { error: isError }]"
+    :value="inputValue"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, defineEmits } from "vue";
+import { ref, Ref, watch } from "vue";
 interface Props {
-  value?: string;
-  class?: string;
+  modelValue?: string;
+  isError?: boolean;
 }
 const props = defineProps<Props>();
 
-const inputValue: Ref<string> = ref(props.value || "");
+const inputValue: Ref<string> = ref(props.modelValue || "");
 
 const emit = defineEmits<{
   (event: "update:model-value", value: string): void;
@@ -20,6 +24,11 @@ const handleInput = (e: Event) => {
   inputValue.value = (e.target as HTMLInputElement).value;
   emit("update:model-value", inputValue.value);
 };
+
+watch(
+  () => props.modelValue,
+  (newValue) => (inputValue.value = newValue || "")
+);
 </script>
 
 <style lang="scss" scoped>
@@ -32,6 +41,13 @@ const handleInput = (e: Event) => {
 
   &:focus {
     outline-color: $color-black;
+  }
+
+  &.error {
+    outline-color: $color-red;
+    border-color: $color-red;
+    color: $color-red;
+    background-color: darken($color-red, 45%);
   }
 }
 </style>

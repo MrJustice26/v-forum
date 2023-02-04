@@ -6,13 +6,24 @@
       </div>
       <div class="col">
         <v-link to="/">Home</v-link>
+      </div>
+      <div class="col" v-if="email">{{ email }}</div>
+      <div class="col" v-else>
         <v-link to="/auth/login">Log in</v-link>
         <v-link to="/auth/register">Register</v-link>
       </div>
-      <div class="col"></div>
     </nav>
   </header>
 </template>
+
+<script setup lang="ts">
+import { useAuthStore } from "~/stores/auth";
+import { computed } from "vue";
+
+const authStore = useAuthStore();
+const email = computed(() => authStore.getEmail);
+console.log(email);
+</script>
 
 <style scoped lang="scss">
 @import "@/assets/scss/variables.scss";
