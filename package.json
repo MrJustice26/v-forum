@@ -15,8 +15,11 @@
     "sass-loader": "^13.2.0"
   },
   "dependencies": {
+    "@nuxtjs/composition-api": "^0.33.1",
+    "@pinia/nuxt": "^0.4.6",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.9.0"
+    "mongoose": "^6.9.0",
+    "pinia": "^2.0.30"
   }
 }

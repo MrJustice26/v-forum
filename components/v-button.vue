@@ -12,10 +12,15 @@
   font-weight: 600;
   &.btn-primary {
     color: $color-white;
-    background: $color-black;
-    &:hover {
-      background: lighten($color-black, 10%);
+    background: $color-green;
+    transition: background-color 0.2s ease-out;
+    &:not(:disabled):hover {
+      background: darken($color-green, 5%);
     }
+  }
+  &:disabled {
+    cursor: unset;
+    background-color: darken($color-white, 40%);
   }
 }
 </style>

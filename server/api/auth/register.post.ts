@@ -1,31 +1,16 @@
 import User from "~/server/models/User";
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import TokenService from "../utils/token";
 
 export default defineEventHandler(async (event) => {
-
-    const config = useRuntimeConfig();
-
-    const errorFieldsMustBeFilled = {
-        status: 400,
-        data: {
-            message: "Error: Email and password must not be empty!"
-        }
-    }
-    const errorUserAlreadyExists = {
-        status: 400,
-        data: {
-            message: "Error: User with this email is already exists!"
-        }
-    }
-
     const {email, password} = await readBody(event);
-    
-    if(!email || !password) return errorFieldsMustBeFilled;
+
 
     const users = await User.find({"email":email});
     if(users.length){
-        return errorUserAlreadyExists;
+        event.node.res.statusCode = 401
+        event.node.res.statusMessage = "Error: User with this email is already exists!"
+        return {};
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -37,18 +22,14 @@ export default defineEventHandler(async (event) => {
         password: encryptedPassword,
     }
     
-    const token = jwt.sign(newUserData, config.jwtRefreshSecret, { expiresIn: '6h'})
+    const tokens = TokenService.generateTokens(newUserData);
 
-    newUserData.refreshToken = token;
-
-    const newUser = new User(newUserData)
+    const newUser = new User({...newUserData, refreshToken: tokens.refreshToken})
     await newUser.save();
     
-    setCookie(event, 'token', token, {httpOnly: true})
+    setCookie(event, 'token', tokens.refreshToken, {httpOnly: true, maxAge: 6 * 60 * 60 * 1000 })
+
     return {
-        status: 200,
-        data: {
-            message: `User with email ${email} is created successfully!`
-        }
+        accessToken: tokens.accessToken
     }
 })

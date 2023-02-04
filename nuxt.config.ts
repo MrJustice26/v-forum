@@ -36,8 +36,9 @@ export default defineNuxtConfig({
     nitro: {
         plugins: ['~/server/index.ts']
     },
-    
-
+    modules: [
+        '@pinia/nuxt'
+    ],
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
         mongodbPassword: process.env.MONGODB_PASSWORD,
