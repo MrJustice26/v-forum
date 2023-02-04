@@ -1,6 +1,7 @@
 import User from "~/server/models/User";
 import bcrypt from 'bcryptjs';
-import TokenService from "../utils/token";
+import TokenService from "../../services/token-service";
+import ApiError from "~/server/exceptions/api-error";
 
 export default defineEventHandler(async (event) => {
     const {email, password} = await readBody(event);
@@ -8,9 +9,7 @@ export default defineEventHandler(async (event) => {
 
     const users = await User.find({"email":email});
     if(users.length){
-        event.node.res.statusCode = 401
-        event.node.res.statusMessage = "Error: User with this email is already exists!"
-        return {};
+        return ApiError.userAlreadyExists();
     }
 
     const salt = await bcrypt.genSalt(10);
