@@ -44,5 +44,5 @@ export default defineNuxtConfig({
         mongodbPassword: process.env.MONGODB_PASSWORD,
         jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
         jwtAccessSecret: process.env.JWT_ACCESS_SECRET
-    }
+    },
 })
