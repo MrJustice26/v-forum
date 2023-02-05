@@ -2,8 +2,9 @@
   <div class="container">
     <div class="auth">
       <h1>Welcome back!</h1>
-      <v-alert variant="success"> Successfull login! </v-alert>
-      <p v-if="isFetching">Loading...</p>
+      <v-alert variant="danger" v-if="errorMessage">
+        Error: {{ errorMessage }}
+      </v-alert>
       <form @submit.prevent="submitForm">
         <div class="form-content">
           <div class="form-group">
@@ -55,31 +56,27 @@ const loginFieldValues: Ref<LoginFields> = ref({
 });
 
 const isFetching = ref(false);
-const authFeedback = ref("");
+const errorMessage = ref("");
 
 const errors: Ref<LoginFieldsErrors> = ref({});
 
 const submitForm = async () => {
-  authFeedback.value = "";
   const receivedErrors: LoginFieldsErrors = loginValidate(
     loginFieldValues.value
   );
   errors.value = receivedErrors;
 
   const keysAmount = Object.keys(errors.value).length;
-  if (keysAmount > 0) return;
+  if (keysAmount) return;
+
+  login(loginFieldValues.value);
+};
+
+const login = async (payload: LoginFields) => {
   isFetching.value = true;
-  const { data: jsonData, error } = await useFetch("/api/auth/login", {
-    method: "POST",
-    body: JSON.stringify(loginFieldValues.value),
-  });
+  const error = await authStore.login(payload.email, payload.password);
   isFetching.value = false;
-  if (error.value) {
-    authFeedback.value = error.value.statusMessage!;
-  } else {
-    authStore.setUser(jsonData.value?.user?.email);
-    navigateTo("/");
-  }
+  errorMessage.value = error || "";
 };
 </script>
 

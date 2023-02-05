@@ -2,6 +2,9 @@
   <div class="container">
     <div class="auth">
       <h1>Let's get it started!</h1>
+      <v-alert variant="danger" v-if="errorMessage">
+        Error: {{ errorMessage }}
+      </v-alert>
       <form @submit.prevent="submitForm">
         <div class="form-group">
           <label for="email-input">Email</label>
@@ -40,7 +43,9 @@
         </div>
 
         <div class="form-actions">
-          <v-button class="btn btn-primary" type="submit">Register</v-button>
+          <v-button class="btn btn-primary" :disabled="isFetching" type="submit"
+            >Register</v-button
+          >
         </div>
       </form>
     </div>
@@ -49,14 +54,20 @@
 
 <script setup lang="ts">
 import { ref, Ref } from "vue";
+import { useAuthStore } from "~/stores/auth";
 import { RegisterFields, RegisterFieldsErrors } from "./register.types";
 import registerValidate from "./validate";
+
+const authStore = useAuthStore();
 
 const registerFieldValues: Ref<RegisterFields> = ref({
   email: "",
   password: "",
   rpassword: "",
 });
+
+const isFetching = ref(false);
+const errorMessage = ref("");
 
 const errors: Ref<RegisterFieldsErrors> = ref({});
 
@@ -75,13 +86,10 @@ const submitForm = () => {
 };
 
 const register = async (payload: Omit<RegisterFields, "rpassword">) => {
-  await useFetch("/api/auth/register", {
-    method: "POST",
-    body: JSON.stringify(payload),
-    onResponse({ response }) {
-      console.log(response._data);
-    },
-  });
+  isFetching.value = true;
+  const error = await authStore.register(payload.email, payload.password);
+  isFetching.value = false;
+  errorMessage.value = error || "";
 };
 </script>
 

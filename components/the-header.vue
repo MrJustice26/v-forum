@@ -7,7 +7,7 @@
       <div class="col">
         <v-link to="/">Home</v-link>
       </div>
-      <div class="col" v-if="email">{{ email }}</div>
+      <div class="col" v-if="userData?.email">{{ userData.email }}</div>
       <div class="col" v-else>
         <v-link to="/auth/login">Log in</v-link>
         <v-link to="/auth/register">Register</v-link>
@@ -21,8 +21,7 @@ import { useAuthStore } from "~/stores/auth";
 import { computed } from "vue";
 
 const authStore = useAuthStore();
-const email = computed(() => authStore.getEmail);
-console.log(email);
+const userData = computed(() => authStore.getUser);
 </script>
 
 <style scoped lang="scss">
