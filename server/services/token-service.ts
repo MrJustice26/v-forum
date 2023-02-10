@@ -5,14 +5,15 @@ interface Tokens {
     accessToken: string,
     refreshToken: string
 }
-
-const config = useRuntimeConfig();
-
 class TokenService {
+    private config
+    constructor(){
+        this.config = useRuntimeConfig();
+    }
     generateTokens(payload: any): Tokens {
         const tokens: Tokens = {
-            refreshToken: jwt.sign(payload, config.jwtRefreshSecret, { expiresIn: '15d'}),
-            accessToken: jwt.sign(payload, config.jwtAccessSecret, {expiresIn: '30m'})
+            refreshToken: jwt.sign(payload, this.config.jwtRefreshSecret, { expiresIn: '15d'}),
+            accessToken: jwt.sign(payload, this.config.jwtAccessSecret, {expiresIn: '30m'})
         };
     
         return tokens;
@@ -20,7 +21,7 @@ class TokenService {
 
     validateAccessToken(token: string) {
         try {
-            const userData = jwt.verify(token, config.jwtAccessSecret)
+            const userData = jwt.verify(token, this.config.jwtAccessSecret)
             return userData;
         } catch(e) {
             return null;
@@ -29,7 +30,7 @@ class TokenService {
 
     validateRefreshToken(token: string) {
         try {
-            const userData = jwt.verify(token, config.jwtRefreshSecret)
+            const userData = jwt.verify(token, this.config.jwtRefreshSecret)
             return userData;
         } catch(e) {
             return null;

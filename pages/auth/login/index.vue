@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-actions">
-          <v-button class="btn btn-primary" :disabled="isFetching" type="submit"
+          <v-button variant="success" :disabled="isFetching" type="submit"
             >Login</v-button
           >
         </div>

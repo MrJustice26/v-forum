@@ -4,10 +4,11 @@
       <div class="col">
         <v-link to="/" class="main-link">V-Forum</v-link>
       </div>
-      <div class="col">
-        <v-link to="/">Home</v-link>
+      <div class="col" v-if="userData?.email">
+        <v-link :to="`/profile`"
+          ><feather-icon icon="user" />{{ userData.email }}</v-link
+        >
       </div>
-      <div class="col" v-if="userData?.email">{{ userData.email }}</div>
       <div class="col" v-else>
         <v-link to="/auth/login">Log in</v-link>
         <v-link to="/auth/register">Register</v-link>
@@ -18,7 +19,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/auth";
-import { computed } from "vue";
 
 const authStore = useAuthStore();
 const userData = computed(() => authStore.getUser);

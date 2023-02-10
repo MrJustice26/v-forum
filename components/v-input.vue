@@ -7,7 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, watch } from "vue";
+import { Ref } from "vue";
+
 interface Props {
   modelValue?: string;
   isError?: boolean;
