@@ -8,7 +8,8 @@ export const useAuthStore = defineStore({
     state: () => {
         return {
             user: null as IUser | null,
-            isAuth: false
+            isAuth: false,
+            isFetching: false
         } 
     },
     actions: {
@@ -21,7 +22,6 @@ export const useAuthStore = defineStore({
                 if(!error.value){
                     this.setUser(data.value?.user as IUser); 
                     this.setAuth(true);
-                    navigateTo("/");
                     localStorage.setItem('token', data.value?.accessToken!)
                 }
                 return error.value?.statusMessage;
@@ -38,7 +38,6 @@ export const useAuthStore = defineStore({
                 if(!error.value){
                     this.setUser(data.value?.user as IUser); 
                     this.setAuth(true);
-                    navigateTo("/");
                     localStorage.setItem('token', data.value?.accessToken!)
                 }
                 return error.value?.statusMessage;
@@ -50,18 +49,21 @@ export const useAuthStore = defineStore({
         setUser(user: IUser | null){
             this.user = user;
         },
-        setAuth(value: boolean){
-            this.isAuth = value;
+        setAuth(bool: boolean){
+            this.isAuth = bool;
+        },
+        setFetchingStatus(bool: boolean){
+            this.isFetching = bool;
         },
         logout() {
             this.setUser(null);
             this.setAuth(false);
+            localStorage.removeItem('token');
         },
         async checkAuth(){
             const {data, error} = await useFetch("/api/auth/refresh", {
                 method: "GET"
             });
-            console.log(data.value);
             if(!error.value && data.value){
                 localStorage.setItem("token", data.value?.accessToken!);
                 this.setAuth(true);
@@ -71,7 +73,9 @@ export const useAuthStore = defineStore({
     },
     getters: {
         getUser: (state): IUser | null => state.user,
-        getAuthenticatedStatus: (state): boolean => state.isAuth
-    }
+        getAuthenticatedStatus: (state): boolean => state.isAuth,
+        getFetchingStatus: (state): boolean => state.isFetching
+    },
 
 })
+

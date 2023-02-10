@@ -21,16 +21,14 @@ defineProps<Props>();
   color: rgb(190, 190, 190);
   padding: 0.5rem 0.7rem;
   border-radius: 5px;
+  display: flex;
+  align-items: center;
+  column-gap: 7px;
   transition: color 0.2s linear, background-color 0.2s linear;
   &:hover {
     background-color: transparentize($color-white, 0.85);
     color: white;
   }
-  &.router-link-exact-active {
-    color: white;
-    background-color: transparentize($color-white, 0.8);
-  }
-
   &.main-link {
     background-color: transparent;
   }

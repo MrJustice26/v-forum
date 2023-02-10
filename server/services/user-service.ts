@@ -61,12 +61,12 @@ class UserService {
 
     async refresh(refreshToken: string){
         if(!refreshToken){
-            throw ApiError.unAuthorized();
+            return ApiError.unAuthorized();
         }
         const userData = tokenService.validateRefreshToken(refreshToken);
         const receivedToken = await tokenService.findToken(refreshToken);
         if(!userData || !receivedToken){
-            throw ApiError.unAuthorized();
+            return ApiError.unAuthorized();
         }
         const user = await userModel.findById(userData.id);
         const userDto = new UserDto(user);
@@ -74,6 +74,12 @@ class UserService {
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return {...tokens, user: userDto};
+    }
+
+    async logout(refreshToken: string){
+        if(!refreshToken) return ApiError.unAuthorized();
+        const tokenData = await tokenService.removeToken(refreshToken);
+        return tokenData;
     }
 }
 

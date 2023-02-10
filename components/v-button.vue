@@ -1,6 +1,18 @@
 <template>
-  <button><slot /></button>
+  <button :class="['btn', getVariantClassname]"><slot /></button>
 </template>
+
+<script lang="ts" setup>
+interface ButtonProps {
+  variant?: "success" | "danger" | "primary";
+}
+
+const props = defineProps<ButtonProps>();
+
+const getVariantClassname = computed(() =>
+  props.variant ? `btn--${props.variant}` : ""
+);
+</script>
 
 <style lang="scss">
 .btn {
@@ -10,12 +22,27 @@
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  &.btn-primary {
+  transition: background-color 0.2s ease-out;
+
+  &.btn--success {
     color: $color-white;
     background: $color-green;
-    transition: background-color 0.2s ease-out;
     &:not(:disabled):hover {
       background: darken($color-green, 5%);
+    }
+  }
+  &.btn--danger {
+    color: $color-white;
+    background: darken($color-red, 10%);
+    &:not(:disabled):hover {
+      background: $color-darken-red;
+    }
+  }
+  &.btn--primary {
+    color: $color-white;
+    background: darken($color-white, 70%);
+    &:not(:disabled):hover {
+      background: darken($color-white, 80%);
     }
   }
   &:disabled {
