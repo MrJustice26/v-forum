@@ -7,24 +7,24 @@
       </div>
 
       <div class="profile-body">
-        <div class="profile-body__group">Email: {{ getUserData?.email }}</div>
         <div class="profile-body__group">
-          Account status:
-          <v-badge :variant="getAccountStatusColor">{{
+          Email: {{ getUserData?.email }}
+          <n-tag :bordered="false" :type="getAccountStatusColor">{{
             getAccountStatus
-          }}</v-badge>
+          }}</n-tag>
         </div>
       </div>
       <hr />
       <div class="profile-actions">
-        <v-button variant="primary" @click="logout">Log out</v-button>
-        <v-button variant="danger">Delete account</v-button>
+        <n-button type="primary" @click="logout">Log out</n-button>
+        <n-button type="error">Delete account</n-button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { NButton, NTag } from "naive-ui";
 import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore();
@@ -39,7 +39,7 @@ const getAccountStatus = computed(() =>
 );
 
 const getAccountStatusColor = computed(() =>
-  getUserData.value?.isActivated ? "success" : "danger"
+  getUserData.value?.isActivated ? "success" : "error"
 );
 </script>
 
