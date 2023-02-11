@@ -14,30 +14,31 @@
             class="input"
             placeholder="example@gmail.com"
             v-model="registerFieldValues.email"
+            :is-error="!!errors.email"
           />
           <span class="error-text">{{ errors.email }}</span>
         </div>
         <div class="form-group">
           <label for="pass-input">Password</label>
           <v-input
-            autocomplete="on"
             id="pass-input"
             type="password"
             class="input"
             placeholder="1234567890"
             v-model="registerFieldValues.password"
+            :is-error="!!errors.password"
           />
           <span class="error-text">{{ errors.password }}</span>
         </div>
         <div class="form-group">
           <label for="rpass-input">Repeat password</label>
           <v-input
-            autocomplete="on"
             id="rpass-input"
             type="password"
             class="input"
             placeholder="1234567890"
             v-model="registerFieldValues.rpassword"
+            :is-error="!!errors.rpassword"
           />
           <span class="error-text">{{ errors.rpassword }}</span>
         </div>

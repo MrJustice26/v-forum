@@ -4,12 +4,12 @@
       <div class="col">
         <v-link to="/" class="main-link">V-Forum</v-link>
       </div>
-      <div class="col" v-if="userData?.email">
+      <div class="col" v-show="userData?.email">
         <v-link :to="`/profile`"
-          ><feather-icon icon="user" />{{ userData.email }}</v-link
+          ><feather-icon icon="user" />{{ userData?.email }}</v-link
         >
       </div>
-      <div class="col" v-else>
+      <div class="col" v-show="!userData?.email">
         <v-link to="/auth/login">Log in</v-link>
         <v-link to="/auth/register">Register</v-link>
       </div>

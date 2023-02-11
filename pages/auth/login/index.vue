@@ -12,21 +12,22 @@
             <v-input
               id="email-input"
               type="text"
+              class="input"
               placeholder="example@gmail.com"
               v-model="loginFieldValues.email"
-              :is-error="!!errors.email"
+              :is-error="!!errors.password"
             />
             <span class="error-text">{{ errors.email }}</span>
           </div>
           <div class="form-group">
             <label for="pass-input">Password</label>
             <v-input
-              autocomplete="on"
               id="pass-input"
               type="password"
+              class="input"
               placeholder="1234567890"
-              :is-error="!!errors.password"
               v-model="loginFieldValues.password"
+              :is-error="!!errors.password"
             />
             <span class="error-text">{{ errors.password }}</span>
           </div>
@@ -34,7 +35,7 @@
 
         <div class="form-actions">
           <v-button variant="success" :disabled="isFetching" type="submit"
-            >Login</v-button
+            >Register</v-button
           >
         </div>
       </form>

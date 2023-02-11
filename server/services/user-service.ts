@@ -7,10 +7,14 @@ import ApiError from "~/server/exceptions/api-error";
 import {v4 as uuidv4} from 'uuid';
 import userModel from "~~/server/models/User/user-model";
 
-
+interface UserServiceAuthResponse {
+    refreshToken: string,
+    accessToken: string,
+    user: UserDto
+}
 class UserService {
 
-    async login(email: string, password: string){
+    async login(email: string, password: string): Promise<UserServiceAuthResponse | void>{
 
         const user = await User.findOne({email})
         if(!user){
@@ -19,7 +23,7 @@ class UserService {
 
         const arePassEquals = await bcrypt.compare(password, user.password);
         if(!arePassEquals){
-        return ApiError.loginCredentialsIncorrect();
+            return ApiError.loginCredentialsIncorrect();
         }
 
         const userDto = new UserDto(user);
@@ -30,7 +34,7 @@ class UserService {
         return {...tokens, user: userDto}
     }
 
-    async register(email: string, password: string){
+    async register(email: string, password: string): Promise<UserServiceAuthResponse | void>{
         const users = await User.find({"email":email});
         if(users.length){
             return ApiError.userAlreadyExists();
@@ -59,7 +63,7 @@ class UserService {
         return {...tokens, user: userDto}
     }
 
-    async refresh(refreshToken: string){
+    async refresh(refreshToken: string): Promise<UserServiceAuthResponse | void>{
         if(!refreshToken){
             return ApiError.unAuthorized();
         }
