@@ -16,8 +16,10 @@
       </div>
       <hr />
       <div class="profile-actions">
-        <n-button type="primary" @click="logout">Log out</n-button>
-        <n-button type="error">Delete account</n-button>
+        <n-button strong secondary type="primary" @click="logout"
+          >Log out</n-button
+        >
+        <n-button strong secondary type="error">Delete account</n-button>
       </div>
     </div>
   </div>
