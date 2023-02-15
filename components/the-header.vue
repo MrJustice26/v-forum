@@ -4,15 +4,25 @@
       <div class="col">
         <v-link to="/" class="main-link">V-Forum</v-link>
       </div>
-      <div class="col">
-        <v-link to="/">Home</v-link>
-        <v-link to="/login">Log in</v-link>
-        <v-link to="/signup">Register</v-link>
+      <div class="col" v-show="userData?.email">
+        <v-link :to="`/profile`"
+          ><feather-icon icon="user" />{{ userData?.email }}</v-link
+        >
       </div>
-      <div class="col"></div>
+      <div class="col" v-show="!userData?.email">
+        <v-link to="/auth/login">Log in</v-link>
+        <v-link to="/auth/register">Register</v-link>
+      </div>
     </nav>
   </header>
 </template>
+
+<script setup lang="ts">
+import { useAuthStore } from "~/stores/auth";
+
+const authStore = useAuthStore();
+const userData = computed(() => authStore.getUser);
+</script>
 
 <style scoped lang="scss">
 @import "@/assets/scss/variables.scss";

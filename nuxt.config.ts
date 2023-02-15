@@ -2,23 +2,31 @@
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    app: {
-        head: {
-            link: [
-                {
-                    rel: 'preconnect',
-                    href:'https://fonts.googleapis.com'
-                },
-                {
-                    rel: 'preconnect',
-                    href: 'https://fonts.gstatic.com'
-                },
-                {
-                    rel: 'stylesheet',
-                    href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap'
+    vite: {
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    additionalData: '@import "@/assets/scss/variables.scss";'
                 }
-            ]
-        }
+            }
+        },
+        optimizeDeps: {
+            include:
+              process.env.NODE_ENV === 'development'
+                ? ['naive-ui', 'vueuc', 'date-fns-tz/esm/formatInTimeZone']
+                : []
+          }
+    },
+    build: {
+        transpile:
+          process.env.NODE_ENV === 'production'
+            ? [
+                'naive-ui',
+                'vueuc',
+                '@css-render/vue3-ssr',
+                '@juggle/resize-observer'
+              ]
+            : ['@juggle/resize-observer']
     },
     css: [
         "@/assets/scss/main.scss"
@@ -26,9 +34,13 @@ export default defineNuxtConfig({
     nitro: {
         plugins: ['~/server/index.ts']
     },
-
+    modules: [
+        '@pinia/nuxt'
+    ],
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
-        mongodbPassword: process.env.MONGODB_PASSWORD
-    }
+        mongodbPassword: process.env.MONGODB_PASSWORD,
+        jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+        jwtAccessSecret: process.env.JWT_ACCESS_SECRET
+    },
 })

@@ -14,47 +14,11 @@
         <ul class="chat-header">
           <li class="chat-header__item">Main feed</li>
         </ul>
-        <ul class="chat-body">
-          <li v-for="post in posts" class="chat-body__item">
-            <NuxtLink class="link" :to="`/posts/${post.id}`">
-              <div class="card">
-                <h3>{{ post.title }}</h3>
-                <p>{{ post.body }}</p>
-              </div>
-            </NuxtLink>
-          </li>
-        </ul>
       </div>
     </div>
   </main>
 </template>
-
-<script setup lang="ts">
-import { ref, Ref, onMounted } from "vue";
-
-interface IPost {
-  userId: number;
-  id: number;
-  title: string;
-  body: string;
-}
-
-const posts: Ref<IPost[] | []> = ref([]);
-
-const fetchPosts = async (): Promise<void> => {
-  try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    posts.value = await response.json();
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-onMounted(() => fetchPosts());
-</script>
-
 <style lang="scss" scoped>
-@import "@/assets/scss/variables.scss";
 .intro {
   background: #013220;
   padding: 1.5rem 0;
