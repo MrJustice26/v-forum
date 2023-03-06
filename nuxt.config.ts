@@ -41,6 +41,11 @@ export default defineNuxtConfig({
         mongodbUsername: process.env.MONGODB_USERNAME,
         mongodbPassword: process.env.MONGODB_PASSWORD,
         jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
-        jwtAccessSecret: process.env.JWT_ACCESS_SECRET
+        jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
+
+        MAIL_HOST: process.env.MAIL_HOST,
+        MAIL_PORT: process.env.MAIL_PORT,
+        MAIL_USER: process.env.MAIL_USER,
+        MAIL_PASS: process.env.MAIL_PASS,
     },
 })
