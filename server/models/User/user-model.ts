@@ -19,8 +19,7 @@ const UserSchema = new Schema({
     isActivated: {
         type: Boolean,
         required: true
-
-    }
+    },
 })
 
 export default model<IUserModel>('User', UserSchema);
