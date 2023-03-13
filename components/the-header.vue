@@ -8,7 +8,9 @@
       </div>
       <div class="col" v-show="userData?.email">
         <nuxt-link to="/profile">
-          <n-button text size="large">{{ userData?.email }}</n-button>
+          <n-button>
+            {{ userData?.email }}
+          </n-button>
         </nuxt-link>
       </div>
       <div class="col" v-show="!userData?.email">
@@ -28,8 +30,7 @@ import { useAuthStore } from "~/stores/auth";
 import { NButton } from "naive-ui";
 
 const authStore = useAuthStore();
-const userData = computed(() => {});
-console.log(userData);
+const userData = computed(() => authStore.getUser);
 </script>
 
 <style scoped lang="scss">

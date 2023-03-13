@@ -51,6 +51,9 @@ import { useAuthStore } from "~/stores/auth";
 import { LoginFields, LoginFieldsErrors } from "./login.types";
 import { NButton, NInput } from "naive-ui";
 import loginValidate from "./validate";
+import { useMessage } from "naive-ui";
+
+const messageController = useMessage();
 
 const authStore = useAuthStore();
 
@@ -81,6 +84,11 @@ const login = async (payload: LoginFields) => {
   const error = await authStore.login(payload.email, payload.password);
   isFetching.value = false;
   errorMessage.value = error || "";
+  if (errorMessage.value) {
+    messageController.error(errorMessage.value);
+  } else {
+    messageController.success("Success login!");
+  }
 };
 </script>
 
