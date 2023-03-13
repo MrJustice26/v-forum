@@ -4,9 +4,9 @@
     @mouseover="setMenuVisible(true)"
     @mouseleave="setMenuVisible(false)"
   >
-    <v-button class="dropdown__title" variant="primary">
+    <n-button secondary strong class="dropdown__title" variant="success">
       <slot name="title" />
-    </v-button>
+    </n-button>
     <Transition>
       <ul class="dropdown-list" v-if="isMenuVisible">
         <slot />
@@ -14,8 +14,8 @@
     </Transition>
   </div>
 </template>
-
 <script setup lang="ts">
+import { NButton } from "naive-ui";
 const isMenuVisible = ref(false);
 
 const setMenuVisible = (bool: boolean) => {
