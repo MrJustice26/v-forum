@@ -2,50 +2,52 @@
   <div class="container">
     <div class="auth">
       <h1>Let's get it started!</h1>
-      <v-alert variant="danger" v-if="errorMessage">
-        Error: {{ errorMessage }}
-      </v-alert>
       <form @submit.prevent="submitForm">
         <div class="form-group">
           <label for="email-input">Email</label>
-          <v-input
+          <n-input
             id="email-input"
             type="text"
             class="input"
             placeholder="example@gmail.com"
-            v-model="registerFieldValues.email"
-            :is-error="!!errors.email"
+            v-model:value="registerFieldValues.email"
+            :status="!!errors.email ? 'error' : 'success'"
           />
           <span class="error-text">{{ errors.email }}</span>
         </div>
         <div class="form-group">
           <label for="pass-input">Password</label>
-          <v-input
+          <n-input
             id="pass-input"
             type="password"
             class="input"
             placeholder="1234567890"
-            v-model="registerFieldValues.password"
-            :is-error="!!errors.password"
+            v-model:value="registerFieldValues.password"
+            :status="!!errors.password ? 'error' : 'success'"
           />
           <span class="error-text">{{ errors.password }}</span>
         </div>
         <div class="form-group">
           <label for="rpass-input">Repeat password</label>
-          <v-input
+          <n-input
             id="rpass-input"
             type="password"
             class="input"
             placeholder="1234567890"
-            v-model="registerFieldValues.rpassword"
-            :is-error="!!errors.rpassword"
+            v-model:value="registerFieldValues.rpassword"
+            :status="!!errors.rpassword ? 'error' : 'success'"
           />
           <span class="error-text">{{ errors.rpassword }}</span>
         </div>
 
         <div class="form-actions">
-          <v-button variant="success" :disabled="isFetching" type="submit"
-            >Register</v-button
+          <n-button
+            strong
+            secondary
+            type="success"
+            :disabled="isFetching"
+            attr-type="submit"
+            >Login</n-button
           >
         </div>
       </form>
@@ -58,6 +60,7 @@ import { ref, Ref } from "vue";
 import { useAuthStore } from "~/stores/auth";
 import { RegisterFields, RegisterFieldsErrors } from "./register.types";
 import registerValidate from "./validate";
+import { NButton, NInput } from "naive-ui";
 
 const authStore = useAuthStore();
 
@@ -91,6 +94,9 @@ const register = async (payload: Omit<RegisterFields, "rpassword">) => {
   const error = await authStore.register(payload.email, payload.password);
   isFetching.value = false;
   errorMessage.value = error || "";
+  // if (errorMessage.value) {
+  //   messageController.error(errorMessage.value);
+  // }
 };
 </script>
 

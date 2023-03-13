@@ -2,16 +2,22 @@
   <header>
     <nav class="container">
       <div class="col">
-        <v-link to="/" class="main-link">V-Forum</v-link>
+        <nuxt-link to="/">
+          <n-button text size="large" class="main-link"> V-Forum </n-button>
+        </nuxt-link>
       </div>
       <div class="col" v-show="userData?.email">
-        <v-link :to="`/profile`"
-          ><feather-icon icon="user" />{{ userData?.email }}</v-link
-        >
+        <nuxt-link to="/profile">
+          <n-button text size="large">{{ userData?.email }}</n-button>
+        </nuxt-link>
       </div>
       <div class="col" v-show="!userData?.email">
-        <v-link to="/auth/login">Log in</v-link>
-        <v-link to="/auth/register">Register</v-link>
+        <nuxt-link to="/auth/login">
+          <n-button text>Log in</n-button></nuxt-link
+        >
+        <nuxt-link to="/auth/register">
+          <n-button text>Register</n-button></nuxt-link
+        >
       </div>
     </nav>
   </header>
@@ -19,9 +25,11 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "~/stores/auth";
+import { NButton } from "naive-ui";
 
 const authStore = useAuthStore();
-const userData = computed(() => authStore.getUser);
+const userData = computed(() => {});
+console.log(userData);
 </script>
 
 <style scoped lang="scss">
@@ -39,8 +47,11 @@ nav {
   align-items: center;
   column-gap: 2rem;
   a {
-    color: white;
     text-decoration: none;
+  }
+
+  .main-link {
+    font-size: 1.2rem;
   }
 }
 </style>
