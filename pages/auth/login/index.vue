@@ -2,40 +2,42 @@
   <div class="container">
     <div class="auth">
       <h1>Welcome back!</h1>
-      <v-alert variant="danger" v-if="errorMessage">
-        Error: {{ errorMessage }}
-      </v-alert>
       <form @submit.prevent="submitForm">
         <div class="form-content">
           <div class="form-group">
             <label for="email-input">Email</label>
-            <v-input
+            <n-input
               id="email-input"
               type="text"
               class="input"
               placeholder="example@gmail.com"
-              v-model="loginFieldValues.email"
-              :is-error="!!errors.password"
+              v-model:value="loginFieldValues.email"
+              :status="!!errors.password ? 'error' : 'success'"
             />
             <span class="error-text">{{ errors.email }}</span>
           </div>
           <div class="form-group">
             <label for="pass-input">Password</label>
-            <v-input
+            <n-input
               id="pass-input"
               type="password"
               class="input"
               placeholder="1234567890"
-              v-model="loginFieldValues.password"
-              :is-error="!!errors.password"
+              v-model:value="loginFieldValues.password"
+              :status="!!errors.password ? 'error' : 'success'"
             />
             <span class="error-text">{{ errors.password }}</span>
           </div>
         </div>
 
         <div class="form-actions">
-          <v-button variant="success" :disabled="isFetching" type="submit"
-            >Register</v-button
+          <n-button
+            strong
+            secondary
+            type="success"
+            attr-type="submit"
+            :disabled="isFetching"
+            >Register</n-button
           >
         </div>
       </form>
@@ -47,7 +49,11 @@
 import { ref, Ref } from "vue";
 import { useAuthStore } from "~/stores/auth";
 import { LoginFields, LoginFieldsErrors } from "./login.types";
+import { NButton, NInput } from "naive-ui";
 import loginValidate from "./validate";
+import { useMessage } from "naive-ui";
+
+const messageController = useMessage();
 
 const authStore = useAuthStore();
 
@@ -78,6 +84,11 @@ const login = async (payload: LoginFields) => {
   const error = await authStore.login(payload.email, payload.password);
   isFetching.value = false;
   errorMessage.value = error || "";
+  if (errorMessage.value) {
+    messageController.error(errorMessage.value);
+  } else {
+    messageController.success("Success login!");
+  }
 };
 </script>
 
