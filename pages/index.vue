@@ -2,7 +2,7 @@
   <section class="intro">
     <div class="intro-wrapper">
       <div class="container">
-        <h1>V-Forum</h1>
+        <n-h1>V-Forum</n-h1>
         <p>The most progressive forum for your needs.</p>
       </div>
     </div>
@@ -18,6 +18,9 @@
     </div>
   </main>
 </template>
+<script setup lang="ts">
+import { NH1 } from "naive-ui";
+</script>
 <style lang="scss" scoped>
 .intro {
   background: #013220;

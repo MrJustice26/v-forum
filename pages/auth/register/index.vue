@@ -61,6 +61,9 @@ import { useAuthStore } from "~/stores/auth";
 import { RegisterFields, RegisterFieldsErrors } from "./register.types";
 import registerValidate from "./validate";
 import { NButton, NInput } from "naive-ui";
+import { useMessage } from "naive-ui";
+
+const messageController = useMessage();
 
 const authStore = useAuthStore();
 
@@ -94,9 +97,11 @@ const register = async (payload: Omit<RegisterFields, "rpassword">) => {
   const error = await authStore.register(payload.email, payload.password);
   isFetching.value = false;
   errorMessage.value = error || "";
-  // if (errorMessage.value) {
-  //   messageController.error(errorMessage.value);
-  // }
+  if (errorMessage.value) {
+    messageController.error(errorMessage.value);
+  } else {
+    messageController.success("Please submit your email!");
+  }
 };
 </script>
 
