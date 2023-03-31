@@ -1,11 +1,7 @@
-
 interface RegisterFields {
-  email: string;
-  password: string;
-  rpassword: string;
+    email: string
+    password: string
+    rpassword: string
 }
 
-type RegisterFieldsErrors = Partial<Record<keyof RegisterFields, string>>
-
-
-export {RegisterFields, RegisterFieldsErrors};
+export { RegisterFields }
