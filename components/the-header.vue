@@ -8,9 +8,7 @@
       </div>
       <div class="col" v-show="userData?.email">
         <nuxt-link to="/profile">
-          <n-button>
-            {{ userData?.email }}
-          </n-button>
+          <n-button quaternary><feather-icon icon="user" /> Profile </n-button>
         </nuxt-link>
       </div>
       <div class="col" v-show="!userData?.email">
