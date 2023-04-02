@@ -1,8 +1,9 @@
 interface IPostModel {
-    author: string;
-    createdAt: Date;
-    title: string;
-    content: string;
+    author: string
+    createdAt: string
+    title: string
+    content: string
+    score: number
 }
 
 export default IPostModel
