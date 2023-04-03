@@ -77,7 +77,7 @@
 import { NH1, NAvatar, NButton, NModal, NInput } from 'naive-ui'
 import { mockPosts } from '~/mocks/posts'
 import { relativeFormat } from '~/utils/relativeFormat'
-import { required, minLength, helpers, sameAs } from '@vuelidate/validators'
+import { required, minLength, helpers } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFormBuilder } from '~~/composables/useFormBuilder'
 const getFirstLetter = (str: string) => str.charAt(0).toUpperCase()
@@ -109,15 +109,20 @@ const createdForm = useFormBuilder({
     onSubmit: () => console.log('Hello world'),
     rules: {
         email: {
-            required: helpers.withMessage('Email is required!', required),
-            minLength: minLength(10),
+            required: true,
+            message: 'Please input your email',
+            trigger: ['input', 'blur'],
         },
         password: {
             required: true,
-            minLength: minLength(6),
+            message: 'Please input your password',
+            trigger: ['input', 'blur'],
         },
         rpassword: {
             required: true,
+            message: 'Please input your password',
+            sameAs: 'password',
+            trigger: ['input', 'blur'],
         },
     },
 })
