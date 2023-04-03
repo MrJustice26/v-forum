@@ -1,5 +1,4 @@
-import { NForm, NFormItem, NInput, NButton, FormItemRule } from 'naive-ui'
-import { useVuelidate } from '@vuelidate/core'
+import { NForm, NFormItem, NInput, NButton, FormInst } from 'naive-ui'
 
 interface FormFieldValidation {
     type: string
@@ -31,32 +30,22 @@ export const useFormBuilder = (options: FormBuilderOptions) => {
     for (const field of options.fields) {
         formValues[field.id] = field.defaultValue || ''
     }
-    const rules = {
-        password: [
-            {
-                required: true,
-                message: 'Password is required',
-            },
-        ],
-    }
-    const v$ = useVuelidate(options.rules || {}, formValues)
+    const rules = options?.rules || {}
+    const formRef = ref<FormInst | null>(null)
 
     const formFields = options.fields.map((formField) => {
         return h(
             NFormItem,
             {
                 label: formField.label,
-                feedback: v$.value[formField.id]?.$errors[0]?.$message,
+                path: formField.id,
             },
             () => [
                 h(NInput, {
                     placeholder: formField.placeholder || '',
                     type: formField.type,
-                    id: formField.id,
                     value: formValues[formField.id],
-                    status: v$.value[formField.id]?.$error
-                        ? 'error'
-                        : 'success',
+
                     onInput: (inputValue) => {
                         formValues[formField.id] = inputValue
                     },
@@ -64,25 +53,29 @@ export const useFormBuilder = (options: FormBuilderOptions) => {
             ]
         )
     })
-    return h(
-        NForm,
-        {
-            onSubmit: (event) => {
-                event.preventDefault()
-                v$.value.$validate()
-                options.onSubmit()
+    return () =>
+        h(
+            NForm,
+            {
+                class: options.className ? options.className : '',
+                model: formValues,
+                rules,
+                ref: formRef,
+                onSubmit: (event) => {
+                    event.preventDefault()
+                    formRef.value?.validate((errors) => {
+                        console.log(errors)
+                    })
+                    options.onSubmit()
+                },
             },
-            class: options.className ? options.className : '',
-            model: formValues,
-            rules,
-        },
-        () => [
-            ...formFields,
-            h(
-                NButton,
-                { attrType: 'submit', tertiary: true, type: 'success' },
-                'Register'
-            ),
-        ]
-    )
+            () => [
+                ...formFields,
+                h(
+                    NButton,
+                    { attrType: 'submit', tertiary: true, type: 'success' },
+                    'Register'
+                ),
+            ]
+        )
 }
