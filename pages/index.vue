@@ -70,64 +70,78 @@
             </template>
         </n-modal>
     </client-only>
-
-    <component :is="createdForm" />
+    <component :is="createdForm.component" />
 </template>
 <script setup lang="ts">
-import { NH1, NAvatar, NButton, NModal, NInput } from 'naive-ui'
+import { NH1, NAvatar, NButton, NModal, NInput, FormItemRule } from 'naive-ui'
 import { mockPosts } from '~/mocks/posts'
 import { relativeFormat } from '~/utils/relativeFormat'
-import { required, minLength, helpers } from '@vuelidate/validators'
-import { useVuelidate } from '@vuelidate/core'
 import { useFormBuilder } from '~~/composables/useFormBuilder'
 const getFirstLetter = (str: string) => str.charAt(0).toUpperCase()
 
-const fields = [
-    {
-        label: 'Email',
-        id: 'email',
-        type: 'text',
-        defaultValue: 'test@gm.com',
-        placeholder: 'test@gm.com',
-    },
-    {
-        label: 'Password',
-        id: 'password',
-        type: 'password',
-        placeholder: '123456',
-    },
-    {
-        label: 'Repeat password',
-        id: 'rpassword',
-        type: 'password',
-        placeholder: '123456',
-    },
-]
 const createdForm = useFormBuilder({
     title: 'Create something',
-    fields,
+    fields: [
+        {
+            label: 'Email',
+            id: 'email',
+            type: 'text',
+            defaultValue: 'test@gm.com',
+            placeholder: 'test@gm.com',
+        },
+        {
+            label: 'Password',
+            id: 'password',
+            type: 'password',
+            placeholder: '123456',
+        },
+        {
+            label: 'Repeat password',
+            id: 'rpassword',
+            type: 'password',
+            placeholder: '123456',
+        },
+    ],
     onSubmit: () => console.log('Hello world'),
-    rules: {
-        email: {
+    rules: {},
+})
+const rules = {
+    email: [
+        {
             required: true,
             message: 'Please input your email',
             trigger: ['input', 'blur'],
         },
-        password: {
-            required: true,
-            message: 'Please input your password',
-            trigger: ['input', 'blur'],
-        },
-        rpassword: {
-            required: true,
-            message: 'Please input your password',
-            sameAs: 'password',
-            trigger: ['input', 'blur'],
-        },
-    },
-})
+    ],
 
-console.log(createdForm)
+    password: [
+        {
+            required: true,
+            message: 'Please input your password',
+            trigger: ['input', 'blur'],
+        },
+        {
+            validator(_: FormItemRule, value: string): boolean {
+                return value.length >= 10
+            },
+            message: 'Password is too short! Min length 10+ characters',
+            trigger: ['input', 'blur'],
+        },
+    ],
+    rpassword: [
+        {
+            validator(_: FormItemRule, value: string): boolean {
+                return value === createdForm.values['password']
+            },
+            required: true,
+            message: 'Please input your password',
+            trigger: ['input', 'blur'],
+        },
+    ],
+}
+// TODO: Fix this type error
+createdForm.setRules(rules)
+
 const isModalVisible = ref(false)
 
 interface PostFieldValues {
@@ -136,23 +150,11 @@ interface PostFieldValues {
     images: { src: string; alt: string }[]
 }
 
-const rules = {
-    title: {
-        required: helpers.withMessage('Title is required!', required),
-    },
-    text: {
-        required: helpers.withMessage('Text is required!', required),
-        minLength: minLength(60),
-    },
-}
-
 const postFieldValues: PostFieldValues = reactive({
     title: '',
     text: '',
     images: [],
 })
-
-const v$ = useVuelidate(rules, postFieldValues)
 </script>
 <style lang="scss" scoped>
 .intro {

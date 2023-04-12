@@ -1,8 +1,22 @@
-import { NForm, NFormItem, NInput, NButton, FormInst } from 'naive-ui'
+import {
+    NForm,
+    NFormItem,
+    NInput,
+    NButton,
+    FormInst,
+    NH1,
+    FormItemRule,
+} from 'naive-ui'
 
-interface FormFieldValidation {
-    type: string
-    message?: string
+interface FormFieldValidationRule {
+    required: boolean
+    message: string
+    trigger: string[]
+    sameAs?: string
+}
+
+interface FormFieldRules {
+    [fieldId: string]: FormFieldValidationRule[]
 }
 
 interface FormField {
@@ -13,12 +27,30 @@ interface FormField {
     placeholder?: string
 }
 
+interface FormActionBtn {
+    text: string
+    attrType: 'submit' | 'reset'
+    type: string
+}
+
+interface FormFieldRule {
+    required?: boolean
+    message: string
+    trigger?: string | ('input' | 'blur')[]
+    validator?(_: FormItemRule, value: string): boolean
+}
+
+interface FormRules {
+    [formFieldName: string]: FormFieldRule[]
+}
+
 interface FormBuilderOptions {
     title: string
     className?: string
     onSubmit: Function
     fields: FormField[]
-    rules?: {}
+    rules?: FormFieldRules | {}
+    actions?: FormActionBtn[]
 }
 
 interface FormValues {
@@ -30,9 +62,34 @@ export const useFormBuilder = (options: FormBuilderOptions) => {
     for (const field of options.fields) {
         formValues[field.id] = field.defaultValue || ''
     }
-    const rules = options?.rules || {}
-    const formRef = ref<FormInst | null>(null)
+    const rules = ref(options?.rules || {})
 
+    const defaultActions: FormActionBtn[] = [
+        {
+            text: 'Submit',
+            attrType: 'submit',
+            type: 'success',
+        },
+        {
+            text: 'Reset',
+            attrType: 'reset',
+            type: 'error',
+        },
+    ]
+    // TODO: Fix button type error
+    const defaultActionsToComponents = defaultActions.map((actionData) => {
+        return h(
+            NButton,
+            {
+                attrType: actionData.attrType,
+                type: actionData.type,
+                tertiary: true,
+            },
+            actionData.text
+        )
+    })
+
+    const formRef = ref<FormInst | null>(null)
     const formFields = options.fields.map((formField) => {
         return h(
             NFormItem,
@@ -45,7 +102,6 @@ export const useFormBuilder = (options: FormBuilderOptions) => {
                     placeholder: formField.placeholder || '',
                     type: formField.type,
                     value: formValues[formField.id],
-
                     onInput: (inputValue) => {
                         formValues[formField.id] = inputValue
                     },
@@ -53,29 +109,32 @@ export const useFormBuilder = (options: FormBuilderOptions) => {
             ]
         )
     })
-    return () =>
-        h(
-            NForm,
-            {
-                class: options.className ? options.className : '',
-                model: formValues,
-                rules,
-                ref: formRef,
-                onSubmit: (event) => {
-                    event.preventDefault()
-                    formRef.value?.validate((errors) => {
-                        console.log(errors)
-                    })
-                    options.onSubmit()
+    return {
+        component: () =>
+            h(
+                NForm,
+                {
+                    class: options.className ? options.className : '',
+                    model: formValues,
+                    rules: rules.value,
+                    ref: formRef,
+                    onSubmit: (event) => {
+                        event.preventDefault()
+                        formRef.value?.validate((errors) => {
+                            console.log(errors)
+                        })
+                        options.onSubmit()
+                    },
                 },
-            },
-            () => [
-                ...formFields,
-                h(
-                    NButton,
-                    { attrType: 'submit', tertiary: true, type: 'success' },
-                    'Register'
-                ),
-            ]
-        )
+                () => [
+                    h(NH1, {}, options.title),
+                    ...formFields,
+                    ...defaultActionsToComponents,
+                ]
+            ),
+        values: formValues,
+        setRules: (newRules: FormRules): void => {
+            rules.value = newRules
+        },
+    }
 }
