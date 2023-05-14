@@ -1,70 +1,35 @@
 <template>
-    <div class="container">
-        <div class="auth">
-            <h1>Welcome back!</h1>
+    <BaseContainer class="flex items-center justify-center auth-wrapper">
+        <div class="max-w-[600px] mx-auto p-8 w-full bg-gray-500/10 rounded-md">
+            <h1 class="text-2xl text-center mb-7">Welcome back!</h1>
             <form @submit.prevent="submitForm">
-                <div class="form-content">
-                    <div class="form-group">
-                        <label for="email-input">Email</label>
-                        <n-input
-                            id="email-input"
-                            type="text"
-                            class="input"
-                            placeholder="example@gmail.com"
-                            v-model:value="loginFieldValues.email"
-                            :status="v$.email.$error ? 'error' : 'success'"
-                            @blur="v$.email.$validate()"
-                        />
-                        <span class="error-text" v-show="v$.email.$error">{{
-                            v$.email?.$errors[0]?.$message
-                        }}</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="pass-input">Password</label>
-                        <n-input
-                            id="pass-input"
-                            type="password"
-                            class="input"
-                            placeholder="1234567890"
-                            v-model:value="loginFieldValues.password"
-                            :status="v$.password.$error ? 'error' : 'success'"
-                            @blur="v$.password.$validate()"
-                        />
-                        <span class="error-text" v-show="v$.password.$error">
-                            {{ v$.password?.$errors[0]?.$message }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <n-button
-                        strong
-                        secondary
-                        type="success"
-                        attr-type="submit"
-                        :disabled="isFetching || v$.$errors.length > 0"
-                    >
-                        <template v-if="isFetching">
-                            <n-spin size="small" />
-                        </template>
-                        <template v-else> Login </template>
-                    </n-button>
-                </div>
+                <BaseInput
+                    v-model="loginFieldValues.email"
+                    :error-text="loginFieldErrors.email"
+                    label-text="Email"
+                    id="email-input"
+                    type="email"
+                />
+                <BaseInput
+                    v-model="loginFieldValues.password"
+                    type="password"
+                    :error-text="loginFieldErrors.password"
+                    label-text="Password"
+                    id="password-input"
+                    autocomplete="on"
+                />
+                <BaseButton>Login</BaseButton>
             </form>
         </div>
-    </div>
+    </BaseContainer>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { LoginFields } from './login.types'
-import { NButton, NInput, NSpin } from 'naive-ui'
-import { useMessage } from 'naive-ui'
 import { required, email, minLength, helpers } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
-
-const messageController = useMessage()
 
 const authStore = useAuthStore()
 
@@ -72,6 +37,12 @@ const loginFieldValues = reactive({
     email: '',
     password: '',
 })
+
+const loginFieldErrors = reactive({
+    email: '',
+    password: '',
+})
+
 const rules = {
     email: {
         required: helpers.withMessage('Email is required!', required),
@@ -84,13 +55,17 @@ const rules = {
 }
 
 const isFetching = ref(false)
-const errorMessage = ref('')
 
 const v$ = useVuelidate(rules, loginFieldValues)
 
 const submitForm = async () => {
     v$.value.$validate()
     const errors = v$.value.$errors
+
+    loginFieldErrors.email =
+        (v$.value.email.$errors[0]?.$message as string) || ''
+    loginFieldErrors.password =
+        (v$.value.password.$errors[0]?.$message as string) || ''
 
     if (errors.length > 0) return
 
@@ -101,48 +76,15 @@ const login = async (payload: LoginFields) => {
     isFetching.value = true
     const error = await authStore.login(payload.email, payload.password)
     isFetching.value = false
-    errorMessage.value = error || ''
-    if (errorMessage.value) {
-        messageController.error(errorMessage.value)
+    if (error) {
+        // messageController.error(error)
     } else {
-        messageController.success('Success login!')
+        // messageController.success('Success login!')
     }
 }
 </script>
 
-<style lang="scss" scoped>
-.auth {
-    max-width: 600px;
-    margin: 0 auto;
-    margin-top: 50px;
-    width: 100%;
-    background-color: lighten($color-black, 5%);
-    padding: 2rem;
-
-    h1 {
-        text-align: center;
-        margin: 0;
-        margin-bottom: 1rem;
-    }
-}
-
-.form-content {
-    margin-bottom: 1.5rem;
-}
-.form-group {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.form-actions {
-    display: flex;
-    flex-direction: column;
-}
-
-.error-text {
-    color: $color-red;
-    font-size: 0.8rem;
-}
+<style lang="sass" scoped>
+.auth-wrapper
+    height: calc(100vh - 72px)
 </style>
