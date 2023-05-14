@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <BaseContainer>
         <div class="profile">
             <div class="profile-header">
                 <feather-icon icon="user" />
@@ -9,26 +9,23 @@
             <div class="profile-body">
                 <div class="profile-body__group">
                     Email: {{ getUserData?.email }}
-                    <n-tag :bordered="false" :type="getAccountStatusColor">{{
-                        getAccountStatus
-                    }}</n-tag>
+                    <span
+                        class="py-2 px-4 rounded-sm font-medium"
+                        :class="tagClassName"
+                    >
+                        {{ getAccountStatus }}
+                    </span>
                 </div>
             </div>
-            <hr />
+            <hr class="mb-5" />
             <div class="profile-actions">
-                <n-button strong secondary type="primary" @click="logout"
-                    >Log out</n-button
-                >
-                <n-button strong secondary type="error"
-                    >Delete account</n-button
-                >
+                <BaseButton @click="logout">Logout</BaseButton>
             </div>
         </div>
-    </div>
+    </BaseContainer>
 </template>
 
 <script lang="ts" setup>
-import { NButton, NTag } from 'naive-ui'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
@@ -42,8 +39,8 @@ const getAccountStatus = computed(() =>
     getUserData.value?.isActivated ? 'Activated' : 'Not activated'
 )
 
-const getAccountStatusColor = computed(() =>
-    getUserData.value?.isActivated ? 'success' : 'error'
+const tagClassName = computed(() =>
+    getUserData.value?.isActivated ? 'bg-emerald-700/50' : 'bg-red-700/50'
 )
 </script>
 

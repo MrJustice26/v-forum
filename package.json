@@ -8,6 +8,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.6.8",
     "@types/bcryptjs": "^2.4.2",
     "@types/feather-icons": "^4.29.1",
     "@types/jsonwebtoken": "^9.0.1",
@@ -26,7 +27,6 @@
     "feather-icons": "^4.29.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.0",
-    "naive-ui": "^2.34.3",
     "nodemailer": "^6.9.1",
     "pinia": "^2.0.30",
     "uuid": "^9.0.0"
