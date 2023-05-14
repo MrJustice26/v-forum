@@ -13,5 +13,13 @@
 
     <NuxtLayout>
         <NuxtPage />
+        <ClientOnly>
+            <Toaster
+                richColors
+                closeButton
+                theme="dark"
+                position="top-center"
+            />
+        </ClientOnly>
     </NuxtLayout>
 </template>

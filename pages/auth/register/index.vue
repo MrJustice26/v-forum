@@ -35,14 +35,10 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { RegisterFields } from './register.types'
-import {
-    required,
-    email,
-    minLength,
-    sameAs,
-    helpers,
-} from '@vuelidate/validators'
+import { required, email, minLength, helpers } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
+
+const { $toast } = useNuxtApp()
 
 const registerFieldValues = reactive({
     email: '',
@@ -74,8 +70,6 @@ const rules = {
     },
 }
 
-// const messageController = useMessage()
-
 const authStore = useAuthStore()
 
 const isFetching = ref(false)
@@ -105,9 +99,9 @@ const register = async (payload: Omit<RegisterFields, 'rpassword'>) => {
     const error = await authStore.register(payload.email, payload.password)
     isFetching.value = false
     if (error) {
-        // messageController.error(error)
+        $toast.error(error)
     } else {
-        // messageController.success('Success login!')
+        $toast.success('Success login!')
     }
 }
 </script>
