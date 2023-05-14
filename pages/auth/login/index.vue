@@ -31,6 +31,8 @@ import { LoginFields } from './login.types'
 import { required, email, minLength, helpers } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 
+const { $toast } = useNuxtApp()
+
 const authStore = useAuthStore()
 
 const loginFieldValues = reactive({
@@ -77,9 +79,9 @@ const login = async (payload: LoginFields) => {
     const error = await authStore.login(payload.email, payload.password)
     isFetching.value = false
     if (error) {
-        // messageController.error(error)
+        $toast.error(error)
     } else {
-        // messageController.success('Success login!')
+        $toast.success('Success login!')
     }
 }
 </script>

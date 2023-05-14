@@ -4,6 +4,9 @@ export default defineNuxtConfig({
     nitro: {
         plugins: ['~/server/index.ts'],
     },
+    build: {
+        transpile: ['vue-sonner'],
+    },
     modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
