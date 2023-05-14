@@ -1,10 +1,9 @@
-import { useAuthStore } from "~/stores/auth";
+import { useAuthStore } from '~/stores/auth'
 
-export default defineNuxtPlugin((nuxtApp) => {
-  // TODO: REWORK
-  const authStore = useAuthStore();
-  if (!authStore.isAuth && localStorage.getItem("token")) {
-    authStore.checkAuth();
-  }
-  authStore.setFetchingStatus(true);
-});
+export default defineNuxtPlugin(() => {
+    const authStore = useAuthStore()
+    if (localStorage.getItem('token')) {
+        authStore.checkAuth()
+    }
+    authStore.setFetchingStatus(true)
+})
