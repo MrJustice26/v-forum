@@ -32,8 +32,7 @@ interface BaseInput {
     errorText?: string
 }
 
-const props = defineProps<BaseInput>()
+defineProps<BaseInput>()
 
-const textError = computed(() => props.errorText || '')
 const errorInputClassNames = `text-red-400 border-red-200 hover:border-red-200 focus:border-red-200 focus:bg-red-300/10`
 </script>
