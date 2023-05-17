@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     build: {
         transpile: ['vue-sonner'],
     },
-    modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
+    modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'nuxt-icon'],
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
         mongodbPassword: process.env.MONGODB_PASSWORD,

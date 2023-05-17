@@ -14,7 +14,8 @@
                         to="/profile"
                         class="hover:text-emerald-300 transition-colors flex text-lg gap-x-2"
                     >
-                        <feather-icon icon="user" /> Profile
+                        <Icon name="ic:round-person" size="24" />
+                        Profile
                     </nuxt-link>
                 </div>
                 <div v-show="!userData?.email">
