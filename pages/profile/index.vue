@@ -2,7 +2,7 @@
     <BaseContainer>
         <div class="profile">
             <div class="profile-header">
-                <feather-icon icon="user" />
+                <Icon name="ic:round-person" size="32" />
                 <p>Profile settings</p>
             </div>
 
