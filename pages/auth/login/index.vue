@@ -18,7 +18,9 @@
                     id="password-input"
                     autocomplete="on"
                 />
-                <BaseButton>Login</BaseButton>
+                <BaseButton :disabled="isFetching">{{
+                    isFetching ? 'Loading' : 'Login'
+                }}</BaseButton>
             </form>
         </div>
     </BaseContainer>
