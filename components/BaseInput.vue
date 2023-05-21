@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-4">
+    <div>
         <label
             v-if="id && labelText"
             :for="id"
@@ -16,6 +16,7 @@
             :placeholder="placeholder"
         />
         <span
+            v-if="!disableErrorText"
             class="mt-1 text-red-400 font-medium text-sm h-[1rem] inline-block w-full"
             >{{ errorText }}</span
         >
@@ -30,6 +31,7 @@ interface BaseInput {
     type?: string
     modelValue?: string
     errorText?: string
+    disableErrorText?: boolean
 }
 
 defineProps<BaseInput>()

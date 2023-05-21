@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BaseHeader />
+        <BaseHeader class="mb-[4.68rem]" />
         <slot />
     </div>
 </template>

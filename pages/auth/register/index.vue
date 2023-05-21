@@ -26,7 +26,9 @@
                     id="repeat-password-input"
                     autocomplete="on"
                 />
-                <BaseButton>Register</BaseButton>
+                <BaseButton :disabled="isFetching">{{
+                    isFetching ? 'Loading' : 'Register'
+                }}</BaseButton>
             </form>
         </div>
     </BaseContainer>
