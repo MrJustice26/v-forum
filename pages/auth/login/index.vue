@@ -87,8 +87,3 @@ const login = async (payload: LoginFields) => {
     }
 }
 </script>
-
-<style lang="sass" scoped>
-.auth-wrapper
-    height: calc(100vh - 72px)
-</style>

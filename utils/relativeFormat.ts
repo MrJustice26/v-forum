@@ -1,5 +1,9 @@
-import { formatDistance, subDays } from 'date-fns'
-
 export const relativeFormat = (time: string) => {
-    return formatDistance(subDays(new Date(time), 3), new Date())
+    const date = new Date(time)
+
+    return `${date.getDate().toString().padStart(2, '0')}.${(
+        date.getMonth() + 1
+    )
+        .toString()
+        .padStart(2, '0')}.${date.getFullYear()}`
 }

@@ -29,11 +29,15 @@ export const useAuthStore = defineStore({
                 console.log(e)
             }
         },
-        async register(email: string, password: string): Promise<errorMessage> {
+        async register(
+            username: string,
+            email: string,
+            password: string
+        ): Promise<errorMessage> {
             try {
                 const { data, error } = await useFetch('/api/auth/register', {
                     method: 'POST',
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({ email, password, username }),
                 })
                 if (!error.value) {
                     this.setUser(data.value?.user as IUser)

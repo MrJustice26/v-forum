@@ -1,13 +1,13 @@
 import { Schema, model } from 'mongoose'
-import IPostModel from './post-model.type'
+import ICommentModel from './comment-model.type'
 
-const PostSchema = new Schema({
+const CommentSchema = new Schema({
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
     title: { type: String, required: true },
-    content: { type: String, required: true },
+    text: { type: String, required: true },
     score: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, default: [], ref: 'Comment' }],
+    replies: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 })
 
-export default model<IPostModel>('Post', PostSchema)
+export default model<ICommentModel>('Comment', CommentSchema)

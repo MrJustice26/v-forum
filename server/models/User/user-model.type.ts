@@ -1,9 +1,10 @@
 interface IUserModel {
-    _id: string;
-    email: string;
-    password: string;
-    activationLink: string;
-    isActivated: boolean;
+    username: string
+    _id: string
+    email: string
+    password: string
+    activationLink: string
+    isActivated: boolean
 }
 
-export default IUserModel;
+export default IUserModel
