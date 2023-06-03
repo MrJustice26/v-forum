@@ -7,7 +7,13 @@ export default defineNuxtConfig({
     build: {
         transpile: ['vue-sonner'],
     },
-    modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'nuxt-icon'],
+    modules: [
+        '@pinia/nuxt',
+        '@nuxtjs/tailwindcss',
+        'nuxt-icon',
+        '@vueuse/nuxt',
+        '@nuxtjs/cloudinary',
+    ],
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
         mongodbPassword: process.env.MONGODB_PASSWORD,
@@ -18,5 +24,12 @@ export default defineNuxtConfig({
         MAIL_PORT: process.env.MAIL_PORT,
         MAIL_USER: process.env.MAIL_USER,
         MAIL_PASS: process.env.MAIL_PASS,
+
+        CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    },
+    devtools: {
+        enabled: true,
     },
 })

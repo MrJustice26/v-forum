@@ -1,6 +1,6 @@
 <template>
     <div
-        class="py-5 px-6 bg-slate-600/10 rounded-md border-slate-800 border w-full hover:border-emerald-400 transition-colors flex max-h-[600px] h-full"
+        class="py-5 px-6 bg-slate-600/10 rounded-md border-slate-800 border w-full hover:border-emerald-400 transition-colors flex max-h-[600px]"
     >
         <div>
             <div
@@ -11,7 +11,7 @@
                     name="tabler:square-chevron-up"
                 />
                 <span class="text-emerald-400 w-[45px] text-center truncate">{{
-                    computedPoints
+                    computedScore
                 }}</span>
                 <Icon
                     class="text-3xl text-emerald-400"
@@ -23,8 +23,8 @@
             <h3 class="text-xl text-emerald-400 mb-2 font-medium">
                 {{ post.title }}
             </h3>
-            <p class="line-clamp-[15]">
-                {{ post.text }}
+            <p class="line-clamp-2">
+                {{ post.content }}
             </p>
         </div>
     </div>
@@ -34,10 +34,10 @@
 import { numberFormat } from '~~/utils/numberFormat'
 interface PostCard {
     title: string
-    text: string
-    points: number
+    content: string
+    score: number
 }
 
 const props = defineProps<{ post: PostCard }>()
-const computedPoints = computed(() => numberFormat(props.post.points))
+const computedScore = computed(() => numberFormat(props.post.score))
 </script>

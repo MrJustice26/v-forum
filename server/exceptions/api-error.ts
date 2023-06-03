@@ -36,6 +36,13 @@ class ApiError {
             statusMessage: 'Something went wrong!',
         })
     }
+
+    badRequest() {
+        throw createError({
+            statusCode: 400,
+            statusMessage: 'Bad request',
+        })
+    }
 }
 
 export default new ApiError()

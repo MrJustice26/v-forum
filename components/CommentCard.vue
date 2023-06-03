@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-end">
                 <NuxtLink
-                    to="users/1"
+                    to="/users/1"
                     class="font-medium hover:text-green-400 mr-2"
                     >{{ comment.authorText }}</NuxtLink
                 >

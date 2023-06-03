@@ -34,11 +34,17 @@ class UserService {
     }
 
     async register(
+        username: string,
         email: string,
         password: string
     ): Promise<UserServiceAuthResponse | void> {
-        const users = await User.find({ email: email })
-        if (users.length) {
+        const existedUserByEmail = await User.find({ email })
+        if (existedUserByEmail.length) {
+            return ApiError.userAlreadyExists()
+        }
+
+        const existedUserByUsername = await User.find({ username })
+        if (existedUserByUsername.length) {
             return ApiError.userAlreadyExists()
         }
 
@@ -49,6 +55,7 @@ class UserService {
         const activationLink = uuidv4()
 
         const userPayload = {
+            username,
             email,
             password: encryptedPassword,
             isActivated,
@@ -75,7 +82,7 @@ class UserService {
         if (!userData || !receivedToken) {
             return ApiError.unAuthorized()
         }
-        const user = await userModel.findById(userData.id)
+        const user = await userModel.findById(receivedToken.user)
         if (!user) {
             return ApiError.unAuthorized()
         }
@@ -102,6 +109,11 @@ class UserService {
         return {
             message: 'Your email has been activated!',
         }
+    }
+
+    async getUserById(userId: string) {
+        const user = await User.findOne({ _id: userId })
+        return user
     }
 }
 

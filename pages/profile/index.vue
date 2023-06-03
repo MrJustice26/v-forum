@@ -17,6 +17,7 @@
                     </span>
                 </div>
             </div>
+
             <hr class="mb-5" />
             <div class="profile-actions">
                 <BaseButton @click="logout">Logout</BaseButton>

@@ -1,6 +1,6 @@
 <template>
     <BaseContainer class="max-w-[720px]">
-        <h1 class="text-5xl mb-10 text-white font-bold">Hello world</h1>
+        <h1 class="text-5xl mb-10 text-white font-bold">{{ post.title }}</h1>
         <div class="mb-10 flex items-center">
             <img
                 class="rounded-full mr-5"
@@ -10,23 +10,20 @@
             <div class="flex items-center justify-between w-full">
                 <div>
                     <NuxtLink
-                        to="users/1"
+                        :to="`/users/${user._id}`"
                         class="font-medium text-xl hover:text-green-400"
-                        >Barack Obama</NuxtLink
+                        >{{ user.username }}</NuxtLink
                     >
-                    <p>
-                        Published in
-                        <span class="fond-medium text-emerald-500"
-                            >JavaScript</span
-                        >
-                    </p>
+                    <span class="block text-slate-400">{{
+                        relativeFormat(post.createdAt)
+                    }}</span>
                 </div>
                 <div class="text-xl inline-flex gap-x-3 items-end">
                     <button class="hover:text-emerald-400 text-2xl">
                         <Icon name="zondicons:thumbs-down" class="rotate-180" />
                     </button>
                     <span class="text-emerald-400 font-medium">{{
-                        numberFormat(1_500)
+                        computedScore
                     }}</span>
                     <button class="hover:text-emerald-400 text-2xl">
                         <Icon name="zondicons:thumbs-down" />
@@ -35,12 +32,11 @@
             </div>
         </div>
         <p class="text-xl mb-10">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque
-            sapiente sunt ut praesentium dolor provident?
+            {{ post.content }}
         </p>
         <hr class="border-emerald-800 mb-10" />
         <div>
-            <h2 class="text-3xl font-medium mb-5">Comments</h2>
+            <h2 class="text-3xl font-medium mb-7">Comments</h2>
             <ul class="mb-10">
                 <li
                     v-for="comment in mockComments"
@@ -51,7 +47,10 @@
                 </li>
             </ul>
             <div class="text-center mb-10">
-                <BaseButton>Load more comments...</BaseButton>
+                <BaseButton
+                    class="!text-emerald-500 hover:!text-emerald-500 hover:!bg-transparent !bg-transparent"
+                    >Load more comments...</BaseButton
+                >
             </div>
         </div>
         <div>
@@ -66,7 +65,49 @@
 </template>
 
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 import { numberFormat } from '~~/utils/numberFormat'
+
+interface Post {
+    title: string
+    author: string
+    comments: string[]
+    content: string
+    createdAt: string
+    score: number
+    _id: string
+}
+
+const post = ref<Post>({
+    title: '',
+    author: '',
+    comments: [],
+    content: '',
+    createdAt: '',
+    score: 0,
+    _id: '',
+})
+
+const computedScore = computed(() => numberFormat(post.value.score))
+
+interface User {
+    activationLink: string
+    email: string
+    isActivated: boolean
+    password: string
+    username: string
+    _id: string
+}
+
+const user = ref<User>({
+    activationLink: '',
+    email: '',
+    isActivated: false,
+    password: '',
+    username: '',
+    _id: '',
+})
+
 const mockComments = [
     {
         authorText: 'Barack Obama',
@@ -90,4 +131,34 @@ const mockComments = [
         createdAt: new Date('2023-05-01'),
     },
 ]
+
+const route = useRoute()
+const id = route.params.id as string
+
+const fetchPost = async (id: string) => {
+    const { data, error } = await useFetch(`/api/posts/${id}`)
+    if (error.value) {
+        toast.error('Something went wrong, redirecting to home page...')
+        navigateTo('/')
+        return
+    }
+
+    post.value = data.value as Post
+    console.log(post.value)
+}
+
+const fetchUser = async (userId: string) => {
+    const { data, error } = await useFetch(`/api/users/${userId}`)
+    if (error.value) {
+        toast.error('Something went wrong, redirecting to home page...')
+        navigateTo('/')
+        return
+    }
+
+    user.value = data.value as User
+    console.log(post.value)
+}
+
+await fetchPost(id)
+await fetchUser(post.value.author)
 </script>

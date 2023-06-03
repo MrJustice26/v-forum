@@ -4,6 +4,13 @@
             <h1 class="text-2xl text-center mb-7">Let's get it started!</h1>
             <form @submit.prevent="submitForm">
                 <BaseInput
+                    v-model="registerFieldValues.username"
+                    :error-text="registerFieldErrors.username"
+                    label-text="Username"
+                    id="username-input"
+                    type="text"
+                />
+                <BaseInput
                     v-model="registerFieldValues.email"
                     :error-text="registerFieldErrors.email"
                     label-text="Email"
@@ -43,12 +50,14 @@ import { useVuelidate } from '@vuelidate/core'
 const { $toast } = useNuxtApp()
 
 const registerFieldValues = reactive({
+    username: '',
     email: '',
     password: '',
     rpassword: '',
 })
 
 const registerFieldErrors = reactive({
+    username: '',
     email: '',
     password: '',
     rpassword: '',
@@ -57,6 +66,10 @@ const sameAsPassword = (value: string) => {
     return value === registerFieldValues.password
 }
 const rules = {
+    username: {
+        required: helpers.withMessage('Username is required!', required),
+        minLength: minLength(3),
+    },
     email: {
         required: helpers.withMessage('Email is required!', required),
         email,
@@ -82,6 +95,8 @@ const submitForm = () => {
     v$.value.$validate()
     const errors = v$.value.$errors
 
+    registerFieldErrors.username =
+        (v$.value.username.$errors[0]?.$message as string) || ''
     registerFieldErrors.email =
         (v$.value.email.$errors[0]?.$message as string) || ''
     registerFieldErrors.password =
@@ -98,17 +113,16 @@ const submitForm = () => {
 
 const register = async (payload: Omit<RegisterFields, 'rpassword'>) => {
     isFetching.value = true
-    const error = await authStore.register(payload.email, payload.password)
+    const error = await authStore.register(
+        payload.username,
+        payload.email,
+        payload.password
+    )
     isFetching.value = false
     if (error) {
         $toast.error(error)
     } else {
-        $toast.success('Success login!')
+        $toast.success('Success registration!')
     }
 }
 </script>
-
-<style lang="sass" scoped>
-.auth-wrapper
-    height: calc(100vh - 72px)
-</style>

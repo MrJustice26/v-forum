@@ -7,8 +7,8 @@
                 <nuxt-link
                     to="/"
                     class="text-2xl hover:text-emerald-300 transition-colors"
-                    >V-Forum</nuxt-link
-                >
+                    >V-Forum<Icon name="mdi:chat" class="ml-2" />
+                </nuxt-link>
                 <div v-show="userData?.email">
                     <nuxt-link
                         to="/profile"
@@ -18,20 +18,22 @@
                         Profile
                     </nuxt-link>
                 </div>
-                <div v-show="!userData?.email">
-                    <nuxt-link
-                        to="/auth/login"
-                        class="hover:text-emerald-300 transition-colors mr-5"
-                        >Log in</nuxt-link
-                    >
+                <ClientOnly>
+                    <div v-show="!userData?.email">
+                        <nuxt-link
+                            to="/auth/login"
+                            class="hover:text-emerald-300 transition-colors mr-5"
+                            >Log in</nuxt-link
+                        >
 
-                    <nuxt-link
-                        to="/auth/register"
-                        class="hover:text-emerald-300 transition-colors"
-                    >
-                        Register</nuxt-link
-                    >
-                </div>
+                        <nuxt-link
+                            to="/auth/register"
+                            class="hover:text-emerald-300 transition-colors"
+                        >
+                            Register</nuxt-link
+                        >
+                    </div>
+                </ClientOnly>
             </nav>
         </BaseContainer>
     </header>

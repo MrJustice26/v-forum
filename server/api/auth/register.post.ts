@@ -2,8 +2,8 @@ import userService from '~/server/services/user-service'
 import mailService from '~/server/services/mail-service'
 
 export default defineEventHandler(async (event) => {
-    const { email, password } = await readBody(event)
-    const userData = await userService.register(email, password)
+    const { email, password, username } = await readBody(event)
+    const userData = await userService.register(username, email, password)
     if (!userData) return
 
     await mailService.sendActivationLink(userData.user.id)
