@@ -3,7 +3,7 @@ interface ICommentModel {
     createdAt: Date
     title: string
     text: string
-    score: number
+    likes: number
     replies: ICommentModel[]
 }
 

@@ -54,7 +54,7 @@ interface Post {
     author: string
     content: string
     createdAt: string
-    score: number
+    likes: number
     title: string
     _id: string
     comments: string[]
@@ -86,6 +86,10 @@ const submitForm = async () => {
     })
     if (!error.value) {
         toast.success(`Post ${payload.title} created successfully!`)
+        posts.value.unshift(data.value)
+    } else {
+        toast.error(`Something went wrong...`)
+        console.error(error)
     }
 }
 

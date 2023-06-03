@@ -2,6 +2,16 @@ import postModel from '../models/Post/post-model'
 import apiError from '../exceptions/api-error'
 import userModel from '../models/User/user-model'
 
+enum PostReaction {
+    LIKE = 'like',
+    DISLIKE = 'dislike',
+    SWITCH_TO_LIKE = 'switchToLike',
+    SWITCH_TO_DISLIKE = 'switchToDislike',
+    FROM_LIKE_TO_NONE = 'fromLikeToNone',
+    FROM_DISLIKE_TO_NONE = 'fromDislikeToNone',
+    NONE = 'none',
+}
+
 interface PostPayload {
     title: string
     content: string
@@ -52,7 +62,48 @@ class PostService {
 
         if (!newPost) return apiError.internalError()
 
-        return { message: 'OK' }
+        return newPost
+    }
+
+    async performReaction(postKey: string, postReaction: PostReaction) {
+        const post = await postModel.findById(postKey)
+        if (!post) return apiError.badRequest()
+
+        let likes = post.likes
+
+        switch (postReaction) {
+            case PostReaction.LIKE:
+                await post.updateOne({ likes: post.likes + 1 })
+                likes += 1
+                break
+
+            case PostReaction.DISLIKE:
+                await post.updateOne({ likes: post.likes - 1 })
+                likes -= 1
+                break
+
+            case PostReaction.SWITCH_TO_LIKE:
+                await post.updateOne({ likes: post.likes + 2 })
+                likes += 2
+                break
+
+            case PostReaction.SWITCH_TO_DISLIKE:
+                await post.updateOne({ likes: post.likes - 2 })
+                likes -= 2
+                break
+
+            case PostReaction.FROM_DISLIKE_TO_NONE:
+                await post.updateOne({ likes: post.likes + 1 })
+                likes += 1
+                break
+
+            case PostReaction.FROM_LIKE_TO_NONE:
+                await post.updateOne({ likes: post.likes - 1 })
+                likes -= 1
+                break
+        }
+
+        return likes
     }
 }
 

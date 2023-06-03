@@ -19,13 +19,31 @@
                     }}</span>
                 </div>
                 <div class="text-xl inline-flex gap-x-3 items-end">
-                    <button class="hover:text-emerald-400 text-2xl">
+                    <button
+                        class="hover:text-emerald-300 text-2xl transition-colors"
+                        :class="
+                            postReaction === PostReaction.LIKE
+                                ? 'text-emerald-400'
+                                : ''
+                        "
+                        @click="makeLikeButtonHandler"
+                    >
                         <Icon name="zondicons:thumbs-down" class="rotate-180" />
                     </button>
-                    <span class="text-emerald-400 font-medium">{{
-                        computedScore
-                    }}</span>
-                    <button class="hover:text-emerald-400 text-2xl">
+                    <div class="max-w-[100px] block">
+                        <span class="text-emerald-400 font-medium">{{
+                            computedLikes
+                        }}</span>
+                    </div>
+                    <button
+                        @click="makeDislikeButtonHandler"
+                        class="hover:text-red-300 text-2xl transition-colors"
+                        :class="
+                            postReaction === PostReaction.DISLIKE
+                                ? 'text-red-400'
+                                : ''
+                        "
+                    >
                         <Icon name="zondicons:thumbs-down" />
                     </button>
                 </div>
@@ -74,7 +92,7 @@ interface Post {
     comments: string[]
     content: string
     createdAt: string
-    score: number
+    likes: number
     _id: string
 }
 
@@ -84,11 +102,21 @@ const post = ref<Post>({
     comments: [],
     content: '',
     createdAt: '',
-    score: 0,
+    likes: 0,
     _id: '',
 })
 
-const computedScore = computed(() => numberFormat(post.value.score))
+enum PostReaction {
+    LIKE = 'like',
+    DISLIKE = 'dislike',
+    SWITCH_TO_LIKE = 'switchToLike',
+    SWITCH_TO_DISLIKE = 'switchToDislike',
+    FROM_LIKE_TO_NONE = 'fromLikeToNone',
+    FROM_DISLIKE_TO_NONE = 'fromDislikeToNone',
+    NONE = 'none',
+}
+
+const computedLikes = computed(() => numberFormat(post.value.likes))
 
 interface User {
     activationLink: string
@@ -107,6 +135,8 @@ const user = ref<User>({
     username: '',
     _id: '',
 })
+
+const postReaction = ref<PostReaction>(PostReaction.NONE)
 
 const mockComments = [
     {
@@ -144,7 +174,6 @@ const fetchPost = async (id: string) => {
     }
 
     post.value = data.value as Post
-    console.log(post.value)
 }
 
 const fetchUser = async (userId: string) => {
@@ -156,9 +185,95 @@ const fetchUser = async (userId: string) => {
     }
 
     user.value = data.value as User
-    console.log(post.value)
 }
 
 await fetchPost(id)
 await fetchUser(post.value.author)
+
+const makeLikeButtonHandler = () => {
+    switch (postReaction.value) {
+        case PostReaction.LIKE:
+            postReaction.value = PostReaction.FROM_LIKE_TO_NONE
+            break
+
+        case PostReaction.DISLIKE:
+            postReaction.value = PostReaction.SWITCH_TO_LIKE
+            break
+
+        case PostReaction.NONE:
+            postReaction.value = PostReaction.LIKE
+            break
+
+        default:
+            break
+    }
+
+    fetchPostReaction()
+}
+
+const makeDislikeButtonHandler = () => {
+    switch (postReaction.value) {
+        case PostReaction.DISLIKE:
+            postReaction.value = PostReaction.FROM_DISLIKE_TO_NONE
+            break
+
+        case PostReaction.LIKE:
+            postReaction.value = PostReaction.SWITCH_TO_DISLIKE
+            break
+
+        case PostReaction.NONE:
+            postReaction.value = PostReaction.DISLIKE
+            break
+
+        default:
+            break
+    }
+
+    fetchPostReaction()
+}
+
+const performFromSwitchToDefaultReaction = () => {
+    switch (postReaction.value) {
+        case PostReaction.SWITCH_TO_DISLIKE:
+            postReaction.value = PostReaction.DISLIKE
+            break
+
+        case PostReaction.SWITCH_TO_LIKE:
+            postReaction.value = PostReaction.LIKE
+            break
+
+        case PostReaction.FROM_LIKE_TO_NONE:
+            postReaction.value = PostReaction.NONE
+            break
+
+        case PostReaction.FROM_DISLIKE_TO_NONE:
+            postReaction.value = PostReaction.NONE
+            break
+    }
+}
+
+const fetchPostReaction = async () => {
+    const postId = post.value._id
+
+    const payload = JSON.stringify({
+        postId,
+        postReaction: postReaction.value,
+    })
+
+    const { data, error } = await useFetch('/api/posts/perform-reaction', {
+        method: 'POST',
+        body: payload,
+    })
+
+    if (error.value) {
+        toast.error('Something went wrong, redirecting to home page...')
+        navigateTo('/')
+        return
+    }
+    console.log(data.value.likes)
+
+    post.value.likes = data.value.likes as { likes: number }
+
+    performFromSwitchToDefaultReaction()
+}
 </script>
