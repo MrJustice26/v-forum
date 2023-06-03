@@ -5,7 +5,7 @@ interface IPostModel {
     createdAt: Date
     title: string
     content: string
-    score: number
+    likes: number
     comments: ICommentModel[]
 }
 

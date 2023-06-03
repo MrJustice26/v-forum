@@ -12,11 +12,11 @@ export default defineEventHandler(async (event) => {
 
     const { title, content } = await readBody(event)
 
-    const result = await postService.createPost({
+    const createdPost = await postService.createPost({
         title,
         content,
         author: receivedUserId,
     })
 
-    return result
+    return createdPost
 })

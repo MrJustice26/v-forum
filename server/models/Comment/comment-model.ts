@@ -6,7 +6,7 @@ const CommentSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     title: { type: String, required: true },
     text: { type: String, required: true },
-    score: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
     replies: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 })
 

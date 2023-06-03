@@ -11,7 +11,7 @@
                     name="tabler:square-chevron-up"
                 />
                 <span class="text-emerald-400 w-[45px] text-center truncate">{{
-                    computedScore
+                    computedLikes
                 }}</span>
                 <Icon
                     class="text-3xl text-emerald-400"
@@ -35,9 +35,9 @@ import { numberFormat } from '~~/utils/numberFormat'
 interface PostCard {
     title: string
     content: string
-    score: number
+    likes: number
 }
 
 const props = defineProps<{ post: PostCard }>()
-const computedScore = computed(() => numberFormat(props.post.score))
+const computedLikes = computed(() => numberFormat(props.post.likes))
 </script>
