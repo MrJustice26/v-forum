@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-start">
-        <NuxtLink to="users/1" class="mr-5 mt-[5px]">
+        <NuxtLink :to="`/users/${comment.author._id}`" class="mr-5 mt-[5px]">
             <img
                 class="rounded-full"
                 src="https://placehold.co/32x32"
@@ -32,6 +32,7 @@
                 <button
                     class="text-gray-400 hover:text-emerald-300 inline-flex items-center"
                     @click="$emit('reply-click', comment._id)"
+                    v-if="!hideReply"
                 >
                     <Icon name="mdi:message-reply-text" class="mr-1" />
                     <span class="text-sm">Reply</span>
@@ -51,7 +52,7 @@ interface CommentCard extends Omit<ICommentModel, 'author'> {
     }
     _id: string
 }
-const props = defineProps<{ comment: CommentCard }>()
+const props = defineProps<{ comment: CommentCard; hideReply?: boolean }>()
 const computedCreatedAt = computed(() =>
     relativeFormat(props.comment.createdAt)
 )

@@ -9,16 +9,16 @@
                     class="text-2xl hover:text-emerald-300 transition-colors"
                     >V-Forum<Icon name="mdi:chat" class="ml-2" />
                 </nuxt-link>
-                <div v-show="userData?.email">
-                    <nuxt-link
-                        to="/profile"
-                        class="hover:text-emerald-300 transition-colors flex text-lg gap-x-2"
-                    >
-                        <Icon name="ic:round-person" size="24" />
-                        {{ userData?.username }}
-                    </nuxt-link>
-                </div>
                 <ClientOnly>
+                    <div v-show="userData?.email">
+                        <nuxt-link
+                            to="/profile"
+                            class="hover:text-emerald-300 transition-colors flex text-lg gap-x-2"
+                        >
+                            <Icon name="ic:round-person" size="24" />
+                            {{ userData?.username }}
+                        </nuxt-link>
+                    </div>
                     <div v-show="!userData?.email">
                         <nuxt-link
                             to="/auth/login"
