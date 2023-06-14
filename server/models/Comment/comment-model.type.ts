@@ -1,10 +1,10 @@
 interface ICommentModel {
     author: string
-    createdAt: Date
-    title: string
-    text: string
+    createdAt: string
+    content: string
     likes: number
-    replies: ICommentModel[]
+    addedInPost: string
+    repliedOn: string | null
 }
 
 export default ICommentModel

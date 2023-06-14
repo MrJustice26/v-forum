@@ -14,11 +14,6 @@ export default defineNuxtConfig({
         '@vueuse/nuxt',
         '@nuxtjs/cloudinary',
     ],
-    vue: {
-        compilerOptions: {
-            isCustomElement: (tag) => ['Toaster'].includes(tag),
-        },
-    },
     runtimeConfig: {
         mongodbUsername: process.env.MONGODB_USERNAME,
         mongodbPassword: process.env.MONGODB_PASSWORD,

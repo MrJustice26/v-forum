@@ -31,8 +31,9 @@ class PostService {
     async getPostById(id: string) {
         if (!id) return apiError.badRequest()
 
-        const post = await postModel.findById(id)
-        if (!post) return apiError.unAuthorized()
+        const post = await postModel
+            .findById(id)
+            .populate({ path: 'author', select: 'username' })
 
         return post
     }

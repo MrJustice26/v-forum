@@ -1,7 +1,8 @@
 interface IUser {
-    id: string;
-    email: string;
-    isActivated: boolean;
+    id: string
+    username: string
+    email: string
+    isActivated: boolean
 }
 
-export default IUser;
+export default IUser

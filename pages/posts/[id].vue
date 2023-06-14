@@ -10,9 +10,9 @@
             <div class="flex items-center justify-between w-full">
                 <div>
                     <NuxtLink
-                        :to="`/users/${user._id}`"
+                        :to="`/users/${post.author._id}`"
                         class="font-medium text-xl hover:text-green-400"
-                        >{{ user.username }}</NuxtLink
+                        >{{ post.author.username }}</NuxtLink
                     >
                     <span class="block text-slate-400">{{
                         relativeFormat(post.createdAt)
@@ -30,7 +30,7 @@
                     >
                         <Icon name="zondicons:thumbs-down" class="rotate-180" />
                     </button>
-                    <div class="max-w-[100px] block">
+                    <div class="w-[50px] text-center block">
                         <span class="text-emerald-400 font-medium">{{
                             computedLikes
                         }}</span>
@@ -57,11 +57,11 @@
             <h2 class="text-3xl font-medium mb-7">Comments</h2>
             <ul class="mb-10">
                 <li
-                    v-for="comment in mockComments"
-                    :key="comment.id"
+                    v-for="comment in postComments"
+                    :key="comment._id"
                     class="mb-5"
                 >
-                    <CommentCard :comment="comment" />
+                    <CommentCard :comment="comment" @reply-click="replyClick" />
                 </li>
             </ul>
             <div class="text-center mb-10">
@@ -76,8 +76,9 @@
                 class="mb-2"
                 placeholder="What's your thoughts?"
                 disable-error-text
+                v-model="commentContent"
             />
-            <BaseButton>Add comment</BaseButton>
+            <BaseButton @click="addComment">Add comment</BaseButton>
         </div>
     </BaseContainer>
 </template>
@@ -85,82 +86,40 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 import { numberFormat } from '~~/utils/numberFormat'
+import ICommentModel from '~/server/models/Comment/comment-model.type'
+import IPostModel from '~/server/models/Post/post-model.type'
 
-interface Post {
-    title: string
-    author: string
-    comments: string[]
-    content: string
-    createdAt: string
-    likes: number
+interface Post extends Omit<IPostModel, 'author'> {
+    author: {
+        username: string
+        _id: string
+    }
     _id: string
 }
 
 const post = ref<Post>({
     title: '',
-    author: '',
-    comments: [],
+    author: {
+        username: '',
+        _id: '',
+    },
     content: '',
     createdAt: '',
     likes: 0,
     _id: '',
 })
 
-enum PostReaction {
-    LIKE = 'like',
-    DISLIKE = 'dislike',
-    SWITCH_TO_LIKE = 'switchToLike',
-    SWITCH_TO_DISLIKE = 'switchToDislike',
-    FROM_LIKE_TO_NONE = 'fromLikeToNone',
-    FROM_DISLIKE_TO_NONE = 'fromDislikeToNone',
-    NONE = 'none',
-}
-
 const computedLikes = computed(() => numberFormat(post.value.likes))
 
-interface User {
-    activationLink: string
-    email: string
-    isActivated: boolean
-    password: string
-    username: string
+interface PostComment extends Omit<ICommentModel, 'author'> {
+    author: {
+        username: string
+        _id: string
+    }
     _id: string
 }
 
-const user = ref<User>({
-    activationLink: '',
-    email: '',
-    isActivated: false,
-    password: '',
-    username: '',
-    _id: '',
-})
-
-const postReaction = ref<PostReaction>(PostReaction.NONE)
-
-const mockComments = [
-    {
-        authorText: 'Barack Obama',
-        id: 1,
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-        points: 10,
-        createdAt: new Date('2022-01-01'),
-    },
-    {
-        authorText: 'Barack Obama',
-        id: 2,
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-        points: 1000,
-        createdAt: new Date('2022-10-01'),
-    },
-    {
-        authorText: 'Barack Obama',
-        id: 3,
-        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-        points: 1_300_500,
-        createdAt: new Date('2023-05-01'),
-    },
-]
+const postComments = ref<PostComment[]>([])
 
 const route = useRoute()
 const id = route.params.id as string
@@ -176,19 +135,32 @@ const fetchPost = async (id: string) => {
     post.value = data.value as Post
 }
 
-const fetchUser = async (userId: string) => {
-    const { data, error } = await useFetch(`/api/users/${userId}`)
+const fetchComments = async (postId: string) => {
+    const { data, error } = await useFetch('/api/comments/' + postId)
     if (error.value) {
-        toast.error('Something went wrong, redirecting to home page...')
-        navigateTo('/')
+        toast.error('Failed to load comments...')
+        console.error(error.value)
         return
     }
 
-    user.value = data.value as User
+    postComments.value = data.value as PostComment[]
 }
 
 await fetchPost(id)
-await fetchUser(post.value.author)
+await fetchComments(post.value._id)
+
+// =============== POST REACTION =============== //
+
+enum PostReaction {
+    LIKE = 'like',
+    DISLIKE = 'dislike',
+    SWITCH_TO_LIKE = 'switchToLike',
+    SWITCH_TO_DISLIKE = 'switchToDislike',
+    FROM_LIKE_TO_NONE = 'fromLikeToNone',
+    FROM_DISLIKE_TO_NONE = 'fromDislikeToNone',
+    NONE = 'none',
+}
+const postReaction = ref<PostReaction>(PostReaction.NONE)
 
 const makeLikeButtonHandler = () => {
     switch (postReaction.value) {
@@ -270,10 +242,41 @@ const fetchPostReaction = async () => {
         navigateTo('/')
         return
     }
-    console.log(data.value.likes)
 
-    post.value.likes = data.value.likes as { likes: number }
-
+    post.value.likes =
+        data.value?.likes === undefined ? post.value.likes : data.value.likes
     performFromSwitchToDefaultReaction()
+}
+
+// =============== /POST REACTION =============== //
+
+const commentContent = ref<string>('')
+const repliedOn = ref<null | string>(null)
+
+const replyClick = (commentId: string) => {
+    repliedOn.value = commentId
+}
+
+const addComment = async () => {
+    const payload = JSON.stringify({
+        addedInPost: post.value._id,
+        content: commentContent.value,
+        repliedOn: repliedOn.value,
+    })
+
+    const { data, error } = await useFetch('/api/comments/create', {
+        method: 'POST',
+        body: payload,
+    })
+    if (data.value) {
+        toast.success('Comment added!')
+        console.log(data.value)
+    } else {
+        toast.error('Something went wrong on adding the comment')
+        console.error(error.value)
+    }
+
+    commentContent.value = ''
+    repliedOn.value = null
 }
 </script>
