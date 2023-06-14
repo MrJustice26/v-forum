@@ -1,4 +1,7 @@
 <template>
+    <BaseTooltip>
+        <p>Test</p>
+    </BaseTooltip>
     <section class="text-center mb-[4rem]">
         <div class="container mx-auto max-w-[1200px]">
             <h1 class="text-5xl mb-3 font-medium text-emerald-500">V-Forum</h1>

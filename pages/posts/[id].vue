@@ -1,5 +1,5 @@
 <template>
-    <BaseContainer class="max-w-[720px]">
+    <BaseContainer class="max-w-[960px]">
         <h1 class="text-5xl mb-10 text-white font-bold">{{ post.title }}</h1>
         <div class="mb-10 flex items-center">
             <img
@@ -22,11 +22,9 @@
                     <button
                         class="hover:text-emerald-300 text-2xl transition-colors"
                         :class="
-                            postReaction === PostReaction.LIKE
-                                ? 'text-emerald-400'
-                                : ''
+                            postReaction === 'like' ? 'text-emerald-400' : ''
                         "
-                        @click="makeLikeButtonHandler"
+                        @click="makeReactionButtonHandler('like')"
                     >
                         <Icon name="zondicons:thumbs-down" class="rotate-180" />
                     </button>
@@ -36,12 +34,10 @@
                         }}</span>
                     </div>
                     <button
-                        @click="makeDislikeButtonHandler"
+                        @click="makeReactionButtonHandler('dislike')"
                         class="hover:text-red-300 text-2xl transition-colors"
                         :class="
-                            postReaction === PostReaction.DISLIKE
-                                ? 'text-red-400'
-                                : ''
+                            postReaction === 'dislike' ? 'text-red-400' : ''
                         "
                     >
                         <Icon name="zondicons:thumbs-down" />
@@ -59,27 +55,33 @@
                 <li
                     v-for="comment in postComments"
                     :key="comment._id"
-                    class="mb-5"
+                    class="mb-10"
                 >
-                    <CommentCard :comment="comment" @reply-click="replyClick" />
+                    <CommentCard
+                        :comment="comment"
+                        @reply-click="replyClick"
+                        class="mb-5"
+                    />
+                    <ul
+                        class="ms-4 ps-5 border-l border-l-emerald-400"
+                        v-if="comment.replies.length > 0"
+                    >
+                        <li v-for="reply in comment.replies" class="mb-5">
+                            <CommentCard :comment="reply" hide-reply />
+                        </li>
+                    </ul>
                 </li>
             </ul>
-            <div class="text-center mb-10">
-                <BaseButton
-                    class="!text-emerald-500 hover:!text-emerald-500 hover:!bg-transparent !bg-transparent"
-                    >Load more comments...</BaseButton
-                >
-            </div>
         </div>
-        <div>
+        <form @submit.prevent="addComment">
             <BaseInput
                 class="mb-2"
                 placeholder="What's your thoughts?"
                 disable-error-text
                 v-model="commentContent"
             />
-            <BaseButton @click="addComment">Add comment</BaseButton>
-        </div>
+            <BaseButton type="submit">Add comment</BaseButton>
+        </form>
     </BaseContainer>
 </template>
 
@@ -88,6 +90,11 @@ import { toast } from 'vue-sonner'
 import { numberFormat } from '~~/utils/numberFormat'
 import ICommentModel from '~/server/models/Comment/comment-model.type'
 import IPostModel from '~/server/models/Post/post-model.type'
+import { useAuthStore } from '~/stores/auth'
+
+import { usePostReactionLogic } from '~/logic/usePostReactionLogic'
+
+const authStore = useAuthStore()
 
 interface Post extends Omit<IPostModel, 'author'> {
     author: {
@@ -124,6 +131,16 @@ const postComments = ref<PostComment[]>([])
 const route = useRoute()
 const id = route.params.id as string
 
+const postReactionLogic = usePostReactionLogic(id)
+const postReaction = postReactionLogic.postReaction
+
+const makeReactionButtonHandler = async (reactionType: 'like' | 'dislike') => {
+    const likesAmount = await postReactionLogic.makeReactionButtonHandler(
+        reactionType
+    )
+    post.value.likes = likesAmount
+}
+
 const fetchPost = async (id: string) => {
     const { data, error } = await useFetch(`/api/posts/${id}`)
     if (error.value) {
@@ -149,112 +166,31 @@ const fetchComments = async (postId: string) => {
 await fetchPost(id)
 await fetchComments(post.value._id)
 
-// =============== POST REACTION =============== //
-
-enum PostReaction {
-    LIKE = 'like',
-    DISLIKE = 'dislike',
-    SWITCH_TO_LIKE = 'switchToLike',
-    SWITCH_TO_DISLIKE = 'switchToDislike',
-    FROM_LIKE_TO_NONE = 'fromLikeToNone',
-    FROM_DISLIKE_TO_NONE = 'fromDislikeToNone',
-    NONE = 'none',
-}
-const postReaction = ref<PostReaction>(PostReaction.NONE)
-
-const makeLikeButtonHandler = () => {
-    switch (postReaction.value) {
-        case PostReaction.LIKE:
-            postReaction.value = PostReaction.FROM_LIKE_TO_NONE
-            break
-
-        case PostReaction.DISLIKE:
-            postReaction.value = PostReaction.SWITCH_TO_LIKE
-            break
-
-        case PostReaction.NONE:
-            postReaction.value = PostReaction.LIKE
-            break
-
-        default:
-            break
-    }
-
-    fetchPostReaction()
-}
-
-const makeDislikeButtonHandler = () => {
-    switch (postReaction.value) {
-        case PostReaction.DISLIKE:
-            postReaction.value = PostReaction.FROM_DISLIKE_TO_NONE
-            break
-
-        case PostReaction.LIKE:
-            postReaction.value = PostReaction.SWITCH_TO_DISLIKE
-            break
-
-        case PostReaction.NONE:
-            postReaction.value = PostReaction.DISLIKE
-            break
-
-        default:
-            break
-    }
-
-    fetchPostReaction()
-}
-
-const performFromSwitchToDefaultReaction = () => {
-    switch (postReaction.value) {
-        case PostReaction.SWITCH_TO_DISLIKE:
-            postReaction.value = PostReaction.DISLIKE
-            break
-
-        case PostReaction.SWITCH_TO_LIKE:
-            postReaction.value = PostReaction.LIKE
-            break
-
-        case PostReaction.FROM_LIKE_TO_NONE:
-            postReaction.value = PostReaction.NONE
-            break
-
-        case PostReaction.FROM_DISLIKE_TO_NONE:
-            postReaction.value = PostReaction.NONE
-            break
-    }
-}
-
-const fetchPostReaction = async () => {
-    const postId = post.value._id
-
-    const payload = JSON.stringify({
-        postId,
-        postReaction: postReaction.value,
-    })
-
-    const { data, error } = await useFetch('/api/posts/perform-reaction', {
-        method: 'POST',
-        body: payload,
-    })
-
-    if (error.value) {
-        toast.error('Something went wrong, redirecting to home page...')
-        navigateTo('/')
-        return
-    }
-
-    post.value.likes =
-        data.value?.likes === undefined ? post.value.likes : data.value.likes
-    performFromSwitchToDefaultReaction()
-}
-
-// =============== /POST REACTION =============== //
-
 const commentContent = ref<string>('')
 const repliedOn = ref<null | string>(null)
 
 const replyClick = (commentId: string) => {
     repliedOn.value = commentId
+}
+
+interface Comment extends Omit<ICommentModel, 'author'> {
+    author: {
+        _id: string
+        username: string
+    }
+    _id: string
+}
+
+const addVisuallyComment = (commentFromDB: Comment) => {
+    if (!commentFromDB.repliedOn) {
+        postComments.value.push(commentFromDB)
+        return
+    }
+
+    const rootComment = postComments.value.find((comment) => {
+        return comment._id === commentFromDB.repliedOn
+    })
+    rootComment?.replies.push(commentFromDB)
 }
 
 const addComment = async () => {
@@ -264,13 +200,22 @@ const addComment = async () => {
         repliedOn: repliedOn.value,
     })
 
-    const { data, error } = await useFetch('/api/comments/create', {
-        method: 'POST',
-        body: payload,
-    })
+    const { data, error } = await useFetch<ICommentModel>(
+        '/api/comments/create',
+        {
+            method: 'POST',
+            body: payload,
+        }
+    )
     if (data.value) {
         toast.success('Comment added!')
-        console.log(data.value)
+        addVisuallyComment({
+            ...data.value,
+            author: {
+                _id: data.value.author,
+                username: authStore.getUser?.username,
+            },
+        })
     } else {
         toast.error('Something went wrong on adding the comment')
         console.error(error.value)

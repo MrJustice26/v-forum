@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
         postReaction,
     }: { postId: string; postReaction: PostReaction } = await readBody(event)
 
-    console.log(postId, postReaction)
     if (!postId || !postReaction) {
         return apiError.badRequest()
     }
@@ -32,6 +31,5 @@ export default defineEventHandler(async (event) => {
         postId,
         postReaction
     )
-    console.log(updatedPostLikesAmount)
     return { likes: updatedPostLikesAmount }
 })

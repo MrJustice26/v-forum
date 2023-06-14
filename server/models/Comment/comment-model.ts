@@ -8,6 +8,7 @@ const CommentSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     repliedOn: { type: Schema.Types.ObjectId, ref: 'Comment', default: null },
+    replies: [{ type: Schema.Types.ObjectId, ref: 'Comment', default: [] }],
 })
 
 export default model<ICommentModel>('Comment', CommentSchema)

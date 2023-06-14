@@ -14,8 +14,16 @@ class CommentService {
     async getCommentsByPostId(postId: string) {
         if (!postId) return apiError.badRequest()
         const comments = await commentModel
-            .find({ addedInPost: postId })
+            .find({ addedInPost: postId, repliedOn: null })
             .populate({ path: 'author', select: 'username' })
+            .populate({
+                path: 'replies',
+                populate: {
+                    path: 'author replies',
+                    select: 'username',
+                },
+            })
+
             .exec()
         return comments
     }
@@ -42,16 +50,22 @@ class CommentService {
             return apiError.badRequest()
         }
 
+        let commentOnWhichHasBeenReplied
+
         if (repliedOn) {
-            const doesRepliedOnCommentExists = await this.getCommentByCommentId(
+            commentOnWhichHasBeenReplied = await this.getCommentByCommentId(
                 repliedOn
             )
-            if (!doesRepliedOnCommentExists) {
+
+            if (!commentOnWhichHasBeenReplied) {
                 return apiError.badRequest()
             }
         }
 
         const newComment = await commentModel.create(commentPayload)
+
+        commentOnWhichHasBeenReplied?.replies.push(newComment._id)
+        await commentOnWhichHasBeenReplied?.save()
 
         if (!newComment) return apiError.internalError()
 

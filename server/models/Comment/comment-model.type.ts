@@ -5,6 +5,7 @@ interface ICommentModel {
     likes: number
     addedInPost: string
     repliedOn: string | null
+    replies: string[]
 }
 
 export default ICommentModel
