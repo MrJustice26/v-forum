@@ -7,7 +7,6 @@ const PostSchema = new Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
     likes: { type: Number, default: 0 },
-    comments: [{ type: Schema.Types.ObjectId, default: [], ref: 'Comment' }],
 })
 
 export default model<IPostModel>('Post', PostSchema)

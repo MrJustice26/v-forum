@@ -15,7 +15,7 @@
                         class="hover:text-emerald-300 transition-colors flex text-lg gap-x-2"
                     >
                         <Icon name="ic:round-person" size="24" />
-                        Profile
+                        {{ userData?.username }}
                     </nuxt-link>
                 </div>
                 <ClientOnly>
