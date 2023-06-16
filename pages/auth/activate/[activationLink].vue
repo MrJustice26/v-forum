@@ -1,5 +1,11 @@
 <template>
-    <ClientOnly> </ClientOnly>
+    <ClientOnly>
+        <BaseContainer>
+            <BaseAlert :variant="verificationState">
+                {{ verificationFeedback }} You will be redirected shortly...
+            </BaseAlert>
+        </BaseContainer>
+    </ClientOnly>
 </template>
 
 <script setup lang="ts">
@@ -15,21 +21,18 @@ const { data, error } = await useFetch('/api/auth/activate', {
 
 enum VerificationState {
     SUCCESS = 'success',
-    FAIL = 'fail',
+    ERROR = 'error',
 }
 
 const verificationState: VerificationState = data?.value?.message
     ? VerificationState.SUCCESS
-    : VerificationState.FAIL
+    : VerificationState.ERROR
 
 const verificationFeedback = data?.value?.message || error?.value?.statusMessage
 
-if (verificationState === VerificationState.SUCCESS) {
-    // messageController.success(verificationFeedback as string);
-} else {
-    // messageController.error(verificationFeedback as string);
-}
 onMounted(() => {
-    navigateTo('/')
+    setTimeout(() => {
+        navigateTo('/')
+    }, 3000)
 })
 </script>
