@@ -65,6 +65,7 @@
 
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 
 interface BaseFormModal {
     isModalVisible: boolean
@@ -74,11 +75,23 @@ const props = defineProps<BaseFormModal>()
 
 const modal = ref<HTMLElement | null>(null)
 
+const { activate, deactivate } = useFocusTrap(modal)
+
 const { isModalVisible } = toRefs(props)
 
 const emits = defineEmits(['submit', 'close'])
 
 onClickOutside(modal, () => emits('close'))
+
+watch(isModalVisible, async () => {
+    await nextTick()
+    if (isModalVisible.value) {
+        activate()
+    } else {
+        deactivate()
+    }
+})
+
 const submitForm = () => {
     emits('submit')
     emits('close')
