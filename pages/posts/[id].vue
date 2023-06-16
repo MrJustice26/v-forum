@@ -11,12 +11,14 @@
                 <div>
                     <NuxtLink
                         :to="`/users/${post.author._id}`"
-                        class="font-medium text-xl hover:text-green-400"
+                        class="font-medium text-xl hover:text-green-400 block"
                         >{{ post.author.username }}</NuxtLink
                     >
-                    <span class="block text-slate-400">{{
-                        relativeFormat(post.createdAt)
-                    }}</span>
+                    <BaseTooltip :content="post.createdAt">
+                        <span class="text-slate-400">{{
+                            relativeFormat(post.createdAt)
+                        }}</span>
+                    </BaseTooltip>
                 </div>
                 <div class="text-xl inline-flex gap-x-3 items-end">
                     <button
