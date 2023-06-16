@@ -1,97 +1,100 @@
 <template>
-  <section class="intro">
-    <div class="intro-wrapper">
-      <div class="container">
-        <h1>V-Forum</h1>
-        <p>The most progressive forum for your needs.</p>
-      </div>
-    </div>
-  </section>
+    <BaseTooltip>
+        <p>Test</p>
+    </BaseTooltip>
+    <section class="text-center mb-[4rem]">
+        <div class="container mx-auto max-w-[1200px]">
+            <h1 class="text-5xl mb-3 font-medium text-emerald-500">V-Forum</h1>
+            <p>The most progressive forum for your needs.</p>
+        </div>
+    </section>
 
-  <main>
-    <div class="container">
-      <div class="chat">
-        <ul class="chat-header">
-          <li class="chat-header__item">Main feed</li>
-        </ul>
-        <ul class="chat-body">
-          <li v-for="post in posts" class="chat-body__item">
-            <NuxtLink class="link" :to="`/posts/${post.id}`">
-              <div class="card">
-                <h3>{{ post.title }}</h3>
-                <p>{{ post.body }}</p>
-              </div>
-            </NuxtLink>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </main>
+    <main>
+        <BaseContainer>
+            <div class="text-center mb-10">
+                <BaseButton class="inline-flex" @click="isModalVisible = true">
+                    Create post
+                </BaseButton>
+            </div>
+            <ul>
+                <li class="mb-5" v-for="post in posts">
+                    <NuxtLink :key="post._id" :to="`/posts/${post._id}`">
+                        <PostCard :post="post" />
+                    </NuxtLink>
+                </li>
+            </ul>
+        </BaseContainer>
+    </main>
+    <BaseFormModal
+        :is-modal-visible="isModalVisible"
+        @close="closeModalHandler"
+        @submit="submitForm"
+    >
+        <template #header>
+            <h3 class="text-2xl font-bold">Create post</h3>
+        </template>
+        <template #body>
+            <BaseInput
+                v-model="createPostFieldValues.title"
+                type="text"
+                label-text="Title"
+                id="post-tile"
+            />
+            <BaseInput
+                v-model="createPostFieldValues.content"
+                type="text"
+                label-text="Text"
+                id="post-content"
+                is-text-area
+            />
+        </template>
+    </BaseFormModal>
 </template>
-
 <script setup lang="ts">
-import { ref, Ref, onMounted } from "vue";
+import { toast } from 'vue-sonner'
 
-interface IPost {
-  userId: number;
-  id: number;
-  title: string;
-  body: string;
+interface Post {
+    author: string
+    content: string
+    createdAt: string
+    likes: number
+    title: string
+    _id: string
+    comments: string[]
 }
 
-const posts: Ref<IPost[] | []> = ref([]);
+const posts = ref<Post[] | []>([])
+const loadRecentPosts = async () => {
+    const { data, error } = await useFetch('/api/posts/get')
+    posts.value = data.value
+}
 
-const fetchPosts = async (): Promise<void> => {
-  try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    posts.value = await response.json();
-  } catch (e) {
-    console.error(e);
-  }
-};
+const isModalVisible = ref(false)
 
-onMounted(() => fetchPosts());
+const createPostFieldValues = reactive({
+    title: '',
+    content: '',
+})
+
+const closeModalHandler = () => {
+    createPostFieldValues.title = ''
+    createPostFieldValues.content = ''
+    isModalVisible.value = false
+}
+const submitForm = async () => {
+    const payload = { ...createPostFieldValues }
+    const { data, error } = await useFetch('/api/posts/create', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    })
+    if (!error.value) {
+        toast.success(`Post ${payload.title} created successfully!`)
+        posts.value.unshift(data.value)
+    } else {
+        toast.error(`Something went wrong...`)
+        console.error(error)
+    }
+}
+
+loadRecentPosts()
 </script>
-
-<style lang="scss" scoped>
-@import "@/assets/scss/variables.scss";
-.intro {
-  background: #013220;
-  padding: 1.5rem 0;
-  text-align: center;
-}
-
-.chat {
-  padding: 0;
-  margin-top: 3rem;
-  &-header {
-    padding: 0;
-    display: flex;
-    column-gap: 1rem;
-    list-style: none;
-    padding: 0;
-  }
-
-  &-body {
-    padding: 0;
-    list-style: none;
-    &__item {
-      margin-bottom: 1rem;
-    }
-    .link {
-      text-decoration: none;
-    }
-  }
-}
-
-.card {
-  border-radius: 5px;
-  padding: 0.3rem 1rem;
-  color: $color-white;
-  border: 1px solid $color-white;
-
-  &:hover {
-    background-color: darken($color-white, 80%);
-  }
-}
-</style>

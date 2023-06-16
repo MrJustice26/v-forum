@@ -1,20 +1,19 @@
-@import "./variables.scss";
+$color-black: #18181b;
 
 body {
-  font-family: "Montserrat", arial;
-  background: $color-black;
-  color: $color-white;
+  color: white;
+  background-color: $color-black;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  font-smooth: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
 }
 
-.container {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
 
 * {
   box-sizing: border-box;
+  font-family: "Inter", arial;
 }
